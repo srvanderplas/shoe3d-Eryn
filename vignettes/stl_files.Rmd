@@ -10,13 +10,47 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  tidy = TRUE,
   comment = "#>"
 )
+rgl::setupKnitr()
 ```
 
 ```{r setup}
 library(shoe3d)
 library(rgl)
+```
 
-# TODO: This assumes you're working in the data-raw/ directory
+## Basic IO
+
+```{r read-stl}
+# TODO: This assumes you're working within the project directory 
+# (e.g. you have access to the package data-raw/ folder). 
+# We eventually need to change this to use a different file.
+stl <- readSTL(con = list.files("../data-raw", pattern = ".stl", full.names = T)[26], 
+               ascii = F, plot = F)
+```
+
+```{r plot-stl, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
+
+# obtained interactively w/ par3d()$userMatrix and saved with dput()
+shoe_flip_angle <- structure(
+  c(-0.999475359916687, -0.0319919027388096, -0.0030277690384537, 
+     0, -0.0320942476391792, 0.99845552444458, 0.0450587198138237, 
+     0, 0.0015826690942049, 0.0451280698180199, -0.998970746994019, 
+     0, 0, 0, 0, 1), .Dim = c(4L, 4L)) 
+
+# How to plot:
+open3d()
+rgl::triangles3d(stl, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+
+scene <- scene3d()
+```
+
+
+```{r plot-stl-dynamic, fig.width = 8, fig.height = 4, out.width = "100%"}
+# How to plot:
+scene %>%
+  rglwidget(elementId = "shoeSTL")
 ```
