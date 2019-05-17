@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
+[Documentation](https://srvanderplas.github.io/shoe3d)
 
 ## Data Source
 

@@ -7,6 +7,8 @@
 
 <!-- badges: end -->
 
+[Documentation](https://srvanderplas.github.io/shoe3d)
+
 ## Data Source
 
 The shoe data is located at
