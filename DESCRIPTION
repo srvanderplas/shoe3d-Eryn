@@ -1,0 +1,20 @@
+Package: shoe3d
+Title: Work With 3D Scans of Shoe Soles
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Susan",
+           family = "Vanderplas",
+           role = c("aut", "cre"),
+           email = "srvanderplas@gmail.com",
+           comment = c(ORCID = "0000-0002-3803-0972"))
+Description: Contains functions and analyses related to the
+    statistical analysis of 3D scans of shoe soles.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    rgl,
+    dplyr,
+    magrittr,
+    purrr
+RoxygenNote: 6.1.0
