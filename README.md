@@ -19,12 +19,18 @@ To start with, I copied `005*` and `006*` stl files into `data-raw/`
 
 ``` r
 usethis::use_data_raw() # set up directory
-lss_location <- file.path("/lss", "research", "csafe-shoeprints", "ShoeImagingPermanent") # this is true on bigfoot, won't work on windows. 
+
+# this is the file path on bigfoot, but it won't work on windows (or a personal machine). 
+# Replace with something like what's shown above.
+lss_location <- file.path("/lss", "research", "csafe-shoeprints", "ShoeImagingPermanent") 
+
+# Copy the relevant files
 file.copy(from = list.files(lss_location, "00[56]\\d{3}[LR].*\\.stl"), to = "data-raw/", overwrite = F)
-writeLines("*.stl$", con = "data-raw/.gitignore")
 ```
 
-These files can’t be added to github - they’re too big.
+These files can’t be added to github - they’re too big. I’ve modified
+`data-raw/.gitignore` to try to ensure that stl files aren’t monitored
+by git (at least by default).
 
 ## Other Details:
 
