@@ -18,17 +18,33 @@ rgl::setupKnitr()
 
 ```{r setup}
 library(shoe3d)
+library(tidyverse)
 library(rgl)
+library(Rvcg) # package for working with 3d meshes in R
+library(MBA) # Spline regression
 ```
 
-## Basic IO
+## Basic IO and plotting with RGL
 
 ```{r read-stl}
 # TODO: This assumes you're working within the project directory 
 # (e.g. you have access to the package data-raw/ folder). 
 # We eventually need to change this to use a different file.
-stl <- readSTL(con = list.files("../data-raw", pattern = ".stl", full.names = T)[26], 
-               ascii = F, plot = F)
+stl_files <- list.files("../data-raw", pattern = ".stl", full.names = T)
+stl_file_path <- stl_files[str_detect(stl_files, "005772L")][1]
+stl <- readSTL(con = stl_file_path, ascii = F, plot = F)
+
+stl_centered <- scale(stl, center = T, scale = F)
+```
+
+```{r convenience-objects}
+# downsample points so they're not as dense
+ds_frac <- .3
+stl_sample <- stl_centered %>% as.data.frame() %>% dplyr::sample_frac(ds_frac) %>% as.matrix()
+
+# get aspect ratio and ranges
+asp_ranges <- apply(stl_centered, 2, function(x) diff(range(x)))
+asp_ratio <- asp_ranges[1]/asp_ranges[2] # This actually isn't correct - need to use pca or something to get reasonable surface rotation matrix?
 ```
 
 ```{r plot-stl, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
@@ -42,15 +58,205 @@ shoe_flip_angle <- structure(
 
 # How to plot:
 open3d()
-rgl::triangles3d(stl, aspect = "iso", col = "red")
+rgl::triangles3d(stl_centered, aspect = "iso", col = "red")
 view3d(userMatrix = shoe_flip_angle, zoom = .5)
 
 scene <- scene3d()
 ```
 
+```{r write-stl, eval = 1}
+centered_tmp <- "centered_shoe.stl"
+# This doesn't seem to work in rmarkdown, but works in the console.
+writeSTL(con = centered_tmp)
+```
 
 ```{r plot-stl-dynamic, fig.width = 8, fig.height = 4, out.width = "100%"}
 # How to plot:
 scene %>%
   rglwidget(elementId = "shoeSTL")
 ```
+
+## Working with mesh objects
+
+```{r plot-stl-mesh, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
+stl_mesh <- vcgImport(centered_tmp, clean = T)
+plot3d(stl_mesh, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+`Rvcg` has a `vcgUniformRemesh` function - one problem we'll have when comparing two stl files is that the coordinate system will be different. One option might be to interpolate the STL file onto a finely-spaced 3d grid. I'm not sure if that's what this is doing though...
+```{r plot-regular-mesh, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%", cache = T, eval = F}
+# Make regular interval
+# Warning, this takes forever...
+reg_mesh <- vcgUniformRemesh(stl_mesh, voxelSize = .5, multiSample = T, mergeClost = T)
+plot3d(reg_mesh, aspect = "iso", col = "pink")
+plot3d(stl_mesh, col = "red", add = T)
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+There are more artifacts on the edges, but a few of the holes in the original seem to have been filled in. The file is smaller, and has fewer vertices. Not sure what to think here...
+
+## Smoothing
+
+```{r try-smoothing, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
+stl_smooth <- vcgSmooth(stl_mesh, type = "taubin", lambda = .3, mu = -.31)
+plot3d(stl_smooth, aspect = "iso", col = "blue", windowRect = c(0, 0, 3000, round(3000/asp_ratio)))
+points3d(stl_sample, col = "red", add = T, size = 1)
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+Smoothing evens out the surface characterization, but doesn't seem like a good solution to create residuals.
+
+
+## Surface
+The MBA package provides [multilevel b-spline functions](https://www.sintef.no/globalassets/upload/ikt/9011/geometri/mba/mba_doc/index.html) for spatial data - useful for fitting a general plane to the data. 
+
+The number of levels of regression splines can vary. With 1 level, only the flat surface profile is fit, as complexity levels increase, so does the topology of the surface. 
+```{r surface-setup}
+spline_degs <- purrr::map(1:8, ~mba.points(stl_centered, stl_centered[,1:2], asp_ratio, 1, h = .)[[1]])
+np <- length(spline_degs)
+nr <- ceiling(np/2)
+nc <- 2
+```
+
+```{r surface-plot, rgl = TRUE, dev = 'png', fig.width = (nc * 1000)/100, fig.height = nr * round(1000 / asp_ratio)/100, out.width = "100%"}
+rmat <- structure(c(0.945378839969635, -0.203441321849823, -0.254675090312958, 
+                    0, -0.176523759961128, 0.337278544902802, -0.924700558185577, 
+                    0, 0.274019628763199, 0.919150471687317, 0.28294575214386, 0, 
+                    0, 0, 0, 1), .Dim = c(4L, 4L))
+
+open3d(windowRect = c(0, 0, nc * 1000, nr * round(1000 / asp_ratio)), zoom = .5)
+Sys.sleep(3)
+mfrow3d(nr = nr, nc = nc, byrow = T, sharedMouse = T)
+purrr::walk(1:length(spline_degs), function(x) {
+  rgl::triangles3d(spline_degs[[x]], col = "cyan", aspect = "iso")
+  title3d(sprintf("Hierarchical Levels: %d", x))
+  view3d(userMatrix = rmat, zoom = .5)
+  next3d(clear = F)
+})
+```
+I'm not sure whether this will depend on shoe model or not - we don't want to remove all topological characteristics in the first pass because wear would affect the fitted surface. It's probably better to go to about level 3 or 4 at first, and then handle the wear-level variation in a second pass after the surfaces have been aligned. 
+
+The nice thing is that by using the residuals from this process, we basically remove the angle of the scans.
+
+
+```{r spline-and-residual, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4*nr, out.width = "100%"}
+spline <- spline_degs[[4]]
+spline_res <- stl_centered - cbind(0, 0, spline[,3])
+
+resid_angle <- structure(c(-0.980460345745087, -0.195630580186844, 0.0197667293250561, 
+0, 0.039684422314167, -0.2953140437603, -0.954555213451385, 0, 
+-0.192579656839371, 0.935140132904053, -0.297311723232269, 0, 
+0, 0, 0, 1), .Dim = c(4L, 4L))
+
+# Set up plotting space
+nr <- 4
+open3d(windowRect = c(0, 0, 1000, (nr + .25)*round(1000/asp_ratio)), zoom = .5)
+Sys.sleep(3)
+layout3d(matrix(1:(nr + 1), nrow = nr + 1), widths = 1, heights = c(.25, rep(1, nr)), sharedMouse = T)
+
+# Subplot 1: Original scan
+# Add legend
+legend3d("top", c("Points", "Fitted Surface", "Residual Surface"), 
+         col = c("red", "cyan", "darkgreen"), pch = 15, cex = 2, ncol = 3)
+next3d(reuse = F)
+
+rgl::triangles3d(stl_centered, col = "red", aspect = "iso", userMatrix = resid_angle)
+axes3d(expand = 1.1)
+title3d(main = "Original (centered) Shoe Scan")
+
+# Subuplot 2: Surface fit
+next3d()
+rgl::triangles3d(spline, aspect = "iso", col = "cyan", userMatrix = resid_angle, zoom = .5, userMatrix = resid_angle)
+axes3d(expand = 1.1)
+title3d(main = "Spline-fit Regression Surface")
+
+# Subplot 3: Surface w/ points
+next3d()
+rgl::points3d(stl_sample, col = "red", aspect = "iso", size = 1)
+rgl::triangles3d(spline, aspect = "iso", col = "cyan", userMatrix = resid_angle, zoom = .5, userMatrix = resid_angle)
+axes3d(expand = 1.1)
+title3d(main = "Scan w/ Regression Surface")
+
+# Subplot 4: Residuals
+next3d()
+rgl::triangles3d(spline_res, aspect = "iso", col = "darkgreen", userMatrix = resid_angle)
+axes3d(expand = 1.1)
+title3d(main = "Residuals from spline surface")
+```
+
+### Pipeline?
+
+```{r}
+single_shoe <- tibble(
+  path = stl_files,
+  date = str_extract(path, "\\d{8}")
+) %>% 
+  # Get only one shoe
+  filter(str_detect(path, "005772L")) %>%
+  # Get only the first rep
+  filter(str_detect(path, "3_1_1")) %>%
+  mutate(
+    stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
+    ) %>%
+  mutate(
+    asp_ranges = purrr::map(stl, ~apply(., 2, function(x) diff(range(x)))),
+    asp_ratio = purrr::map_dbl(asp_ranges, ~.[1]/.[2]),
+    surface = purrr::map2(stl, asp_ratio, ~mba.points(.x, .x[,1:2], .y, 1, h = 3)[[1]]),
+    resid =  purrr::map2(stl, surface, ~ .x - cbind(0, 0, .y[,3]))
+  )
+
+nr <- nrow(single_shoe)
+```
+
+```{r shoe-over-time, rgl = TRUE, dev = 'png', fig.width = 10, fig.height = nr*10/mean(single_shoe$asp_ratio), out.width = "100%"}
+open3d(windowRect = c(0, 0, 1000, nr*round(1000/mean(single_shoe$asp_ratio))), zoom = .5)
+Sys.sleep(3)
+mfrow3d(nr = nr, nc = 1, byrow = T, sharedMouse = T)
+purrr::walk2(single_shoe$resid, single_shoe$date, function(x, y) {
+  triangles3d(x, col = "cyan", aspect = "iso")
+  title3d(y)
+  next3d(clear = F)
+})
+```
+
+We still have to figure out how to detect the ball of the foot and actually align things in the XY plane.
+
+```{r}
+single_shoe2 <- tibble(
+  path = stl_files,
+  date = str_extract(path, "\\d{8}")
+) %>% 
+  # Get only one shoe
+  filter(str_detect(path, "002054L")) %>%
+  # Get only the first rep
+  filter(str_detect(path, "3_1_1")) %>%
+  mutate(
+    stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
+    ) %>%
+  mutate(
+    asp_ranges = purrr::map(stl, ~apply(., 2, function(x) diff(range(x)))),
+    asp_ratio = purrr::map_dbl(asp_ranges, ~.[1]/.[2]),
+    surface = purrr::map2(stl, asp_ratio, ~mba.points(.x, .x[,1:2], .y, 1, h = 3)[[1]]),
+    resid =  purrr::map2(stl, surface, ~ .x - cbind(0, 0, .y[,3]))
+  )
+
+nr <- nrow(single_shoe2)
+```
+
+```{r shoe-over-time2, rgl = TRUE, dev = 'png', fig.width = 10, fig.height = nr*10/mean(single_shoe$asp_ratio), out.width = "100%"}
+open3d(windowRect = c(0, 0, 1000, nr*round(1000/mean(single_shoe2$asp_ratio))), zoom = .5)
+Sys.sleep(3)
+mfrow3d(nr = nr, nc = 1, byrow = T, sharedMouse = T)
+purrr::walk2(single_shoe2$resid, single_shoe2$date, function(x, y) {
+  triangles3d(x, col = "cyan", aspect = "iso")
+  title3d(y)
+  next3d(clear = F)
+})
+```
+
+Still have to figure out how to correctly orient this...
+
+## Other stuff to Investigate:
+
+- [rayshader](https://www.tylermw.com/3d-printing-rayshader/) - package for generating stl files that are ready for printing. 
