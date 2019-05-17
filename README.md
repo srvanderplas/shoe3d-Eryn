@@ -15,7 +15,8 @@ personal devices, the \\iastate.edupath may not work. In that case,
 replace it with \\las-dfs-01.las.iastate.edu(for example Shoe data would
 become \\las-dfs-01.las.iastate.edu-shoeprints).
 
-To start with, I copied `005*` and `006*` stl files into `data-raw/`
+To start with, I copied `005*` and `002*` left shoe stl files into
+`data-raw/`
 
 ``` r
 usethis::use_data_raw() # set up directory
@@ -25,7 +26,7 @@ usethis::use_data_raw() # set up directory
 lss_location <- file.path("/lss", "research", "csafe-shoeprints", "ShoeImagingPermanent") 
 
 # Copy the relevant files
-file.copy(from = list.files(lss_location, "00[56]\\d{3}[LR].*\\.stl"), to = "data-raw/", overwrite = F)
+file.copy(from = list.files(lss_location, "00[52]\\d{3}[L].*\\.stl", full.names = T), to = "data-raw/", overwrite = F)
 ```
 
 These files can’t be added to github - they’re too big. I’ve modified
