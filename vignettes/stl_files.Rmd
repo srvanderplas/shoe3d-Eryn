@@ -1,6 +1,8 @@
 ---
 title: "Working with STL files in R"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    self_contained: false
 vignette: >
   %\VignetteIndexEntry{Working with STL files in R}
   %\VignetteEngine{knitr::rmarkdown}
