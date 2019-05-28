@@ -195,9 +195,9 @@ single_shoe <- tibble(
   date = str_extract(path, "\\d{8}")
 ) %>% 
   # Get only one shoe
-  filter(str_detect(path, "005772L")) %>%
+  dplyr::filter(str_detect(path, "005772L")) %>%
   # Get only the first rep
-  filter(str_detect(path, "3_1_1")) %>%
+  dplyr::filter(str_detect(path, "3_1_1")) %>%
   mutate(
     stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
     ) %>%
@@ -230,9 +230,9 @@ single_shoe2 <- tibble(
   date = str_extract(path, "\\d{8}")
 ) %>% 
   # Get only one shoe
-  filter(str_detect(path, "002054L")) %>%
+ dplyr:: filter(str_detect(path, "002054L")) %>%
   # Get only the first rep
-  filter(str_detect(path, "3_1_1")) %>%
+ dplyr:: filter(str_detect(path, "3_1_1")) %>%
   mutate(
     stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
     ) %>%

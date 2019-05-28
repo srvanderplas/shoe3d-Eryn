@@ -1,0 +1,116 @@
+---
+title: "Allignment of 3D Shoe Scans"
+output: html_document
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  tidy = TRUE,
+  comment = "#>"
+)
+rgl::setupKnitr()
+```
+
+```{r setup} 
+#adding packages prior to use
+library(shoe3d)
+library(tidyverse)
+library(rgl)
+library(Rvcg) 
+library(MBA) 
+```
+
+
+```{r}
+#setting up file path 
+stl_files <- list.files("../data-raw", pattern = ".stl", full.names = T)
+```
+
+
+
+
+
+The idea of allignment is to take the most basic features, allign them, then by adding complexity of the soul, further allign the two different shoes. 
+
+
+
+
+```{r}
+#grabbing a single shoe
+shoe1 <- tibble(
+  path = stl_files,
+  date = str_extract(path, "\\d{8}")
+) %>% 
+  # Get only one shoe
+ dplyr:: filter(str_detect(path, "005772L")) %>%
+  # Get only the first rep
+ dplyr:: filter(str_detect(path, "3_1_1")) %>%
+  mutate(
+    stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
+    ) %>%
+  mutate(
+    asp_ranges = purrr::map(stl, ~apply(., 2, function(x) diff(range(x)))),
+    asp_ratio = purrr::map_dbl(asp_ranges, ~.[1]/.[2]),
+    surface = purrr::map2(stl, asp_ratio, ~mba.points(.x, .x[,1:2], .y, 1, h = 3)[[1]]),
+    resid =  purrr::map2(stl, surface, ~ .x - cbind(0, 0, .y[,3]))
+  )
+
+nr1<-nrow(shoe1)
+```
+
+
+```{r}
+#grabbing the same brand of shoe but a different wear
+shoe2 <- tibble(
+  path = stl_files,
+  date = str_extract(path, "\\d{8}")
+) %>% 
+  # Get only one shoe
+ dplyr:: filter(str_detect(path, "005772L")) %>%
+  # Get only the first rep
+ dplyr:: filter(str_detect(path, "3_1_2")) %>%
+  mutate(
+    stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
+    ) %>%
+  mutate(
+    asp_ranges = purrr::map(stl, ~apply(., 2, function(x) diff(range(x)))),
+    asp_ratio = purrr::map_dbl(asp_ranges, ~.[1]/.[2]),
+    surface = purrr::map2(stl, asp_ratio, ~mba.points(.x, .x[,1:2], .y, 1, h = 3)[[1]]),
+    resid =  purrr::map2(stl, surface, ~ .x - cbind(0, 0, .y[,3]))
+  )
+nr2<-nrow(shoe2)
+```
+
+
+
+
+
+Ploting the shoes over time to see how they have decayed. 
+
+```{r shoe-over-time2, rgl = TRUE, dev = 'png', fig.width = 10, fig.height = nr*10/mean(single_shoe$asp_ratio), out.width = "100%"}
+open3d(windowRect = c(0, 0, 1000, nr1*round(1000/mean(shoe1$asp_ratio))), zoom = .5)
+Sys.sleep(3)
+mfrow3d(nr = nr1, nc = 1, byrow = T, sharedMouse = T)
+purrr::walk2(shoe1$resid, shoe1$date, function(x, y) {
+  triangles3d(x, col = "cyan", aspect = "iso")
+  title3d(y)
+  next3d(clear = F)
+})
+```
+
+
+```{r shoe-over-time2, rgl = TRUE, dev = 'png', fig.width = 10, fig.height = nr*10/mean(single_shoe$asp_ratio), out.width = "100%"}
+open3d(windowRect = c(0, 0, 1000, nr2*round(1000/mean(shoe1$asp_ratio))), zoom = .5)
+Sys.sleep(3)
+mfrow3d(nr = nr2, nc = 1, byrow = T, sharedMouse = T)
+purrr::walk2(shoe2$resid, shoe2$date, function(x, y) {
+  triangles3d(x, col = "cyan", aspect = "iso")
+  title3d(y)
+  next3d(clear = F)
+})
+```
+
+
+

@@ -26,17 +26,28 @@ The shoe data is located at `\\iastate.edu\lss\research\csafe-shoeprints`. For u
 To start with, I copied `005*` and `002*` left shoe stl files into `data-raw/`
 
 ```{r eval = F}
-usethis::use_data_raw() # set up directory
+#usethis::use_data_raw() # set up directory
 
-# this is the file path on bigfoot, but it won't work on windows (or a personal machine). 
-# Replace with something like what's shown above.
-lss_location <- file.path("/lss", "research", "csafe-shoeprints", "ShoeImagingPermanent") 
+# this is the file path on bigfoot, but it won't work on windows (or a personal machine).
+#mounting smb:
+
+#install.packages("curl")
+#this still isnt working? Email CSSM and waiting for their response 
+require("curl")
+handle <- new_handle()
+handle_setopt(handle, username = "eblagg")
+handle_setopt(handle, password = "") # If needed
+request <- curl_fetch_memory("smb://las-dfs-01.las.iastate.edu/lss/research/csafe-shoeprints/ShoeImagingPermanent", handle = handle)
+contents <- rawToChar(request$content)
+
+lss_location <- file.path("smb://las-dfs-01.las.iastate.edu","/lss", "research","csafe-shoeprints", "ShoeImagingPermanent") 
 
 # Copy the relevant files
-file.copy(from = list.files(lss_location, "00[52]\\d{3}[L].*\\.stl", full.names = T), to = "data-raw/", overwrite = F)
+file.copy(from = list.files(lss_location, "0[48]\\d{3}[L].*\\.stl", full.names = T), to = "data-raw/", overwrite = F)
 ```
 
 These files can't be added to github - they're too big. I've modified `data-raw/.gitignore` to try to ensure that stl files aren't monitored by git (at least by default). 
+
 
 
 ## Other Details:
