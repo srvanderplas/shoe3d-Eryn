@@ -30,12 +30,7 @@ stl_files <- list.files("../data-raw", pattern = ".stl", full.names = T)
 
 
 
-
-
-The idea of allignment is to take the most basic features, allign them, then by adding complexity of the soul, further allign the two different shoes. 
-
-
-
+The idea of allignment is to take the most basic features, allign them, then by adding complexity of the soul, further allign the two different shoes. The idea is that we want to take a lower detail scan of shoe, allign it, then by adding complexity we can further allign the shoes. 
 
 ```{r}
 #grabbing a single shoe
@@ -120,8 +115,6 @@ asp_ratio048 <- asp_ranges048[1]/asp_ranges048[2] # This actually isn't correct 
 
 
 
-
-
 ```{r surface-setup}
 spline_degs048 <- purrr::map(1:8, ~mba.points(stl_centered048, stl_centered048[,1:2], asp_ratio048, 1, h = .)[[1]])
 np048 <- length(spline_degs048)
@@ -130,7 +123,7 @@ nc048 <- 2
 ```
 
 
-Showing the hierarchiacal levels of detail of shoe 048
+Showing the hierarchiacal levels of detail of shoe 048 for the first initial scan of a shoe.
 
 
 
@@ -146,14 +139,25 @@ mfrow3d(nr = nr048, nc = nc048, byrow = T, sharedMouse = T)
 purrr::walk(1:length(spline_degs048), function(x) {
   rgl::triangles3d(spline_degs048[[x]], col = "cyan", aspect = "iso")
   title3d(sprintf("Hierarchical Levels: %d", x))
-  view3d(userMatrix = rmat, zoom = .5)
+  view3d(userMatrix = rmat048, zoom = .5)
   next3d(clear = F)
 })
 ```
 
 To match the shoes, we are going to try and allign with heirachical level 5, as it has some detail in the overall form of the soul of the shoe. Now pulling out the fifth level: 
 
-
+```{r}
+Hier048<-spline_degs048[[5]]
+#plotting in order to view it
+shoe_flip_angle <- structure(
+  c(-0.999475359916687, -0.0319919027388096, -0.0030277690384537, 
+     0, -0.0320942476391792, 0.99845552444458, 0.0450587198138237, 
+     0, 0.0015826690942049, 0.0451280698180199, -0.998970746994019, 
+     0, 0, 0, 0, 1), .Dim = c(4L, 4L)) 
+open3d()
+rgl::triangles3d(Hier048, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
 
 
 Now this the first scan of the shoe, we now want to do the fourth scan as well (as the most deteriartion will occur after the most number of steps. 
@@ -173,9 +177,6 @@ stl_centered048_4 <- scale(stl048_4, center = T, scale = F)
 asp_ranges048_4 <- apply(stl_centered048_4, 2, function(x) diff(range(x)))
 asp_ratio048_4 <- asp_ranges048_4[1]/asp_ranges048_4[2] # This actually isn't correct - need to use pca or something to get reasonable surface rotation matrix?
 ```
-
-
-
 
 
 ```{r surface-setup}
@@ -200,7 +201,7 @@ mfrow3d(nr = nr048_4, nc = nc048_4, byrow = T, sharedMouse = T)
 purrr::walk(1:length(spline_degs048_4), function(x) {
   rgl::triangles3d(spline_degs048_4[[x]], col = "cyan", aspect = "iso")
   title3d(sprintf("Hierarchical Levels: %d", x))
-  view3d(userMatrix = rmat, zoom = .5)
+  view3d(userMatrix = rmat048_4, zoom = .5)
   next3d(clear = F)
 })
 ```
@@ -208,15 +209,23 @@ purrr::walk(1:length(spline_degs048_4), function(x) {
 
 Now taking the fifth level: 
 
-
-
-
-
-
-
-
+```{r}
+Hier048_4<-spline_degs048_4[[5]]
+#plotting in order to view it
+open3d()
+rgl::triangles3d(Hier048_4, aspect = "iso", col = "blue")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
 
  Now we want to allign the hierarchial levels first at level 5. 
+
+
+
+
+ 
+ 
+ 
+ 
  
  
 
