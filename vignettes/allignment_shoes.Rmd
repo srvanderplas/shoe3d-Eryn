@@ -44,7 +44,7 @@ shoe1 <- tibble(
   date = str_extract(path, "\\d{8}")
 ) %>% 
   # Get only one shoe
- dplyr:: filter(str_detect(path, "005772L")) %>%
+ dplyr:: filter(str_detect(path, "048462L")) %>%
   # Get only the first rep
  dplyr:: filter(str_detect(path, "3_1_1")) %>%
   mutate(
@@ -68,9 +68,9 @@ shoe2 <- tibble(
   date = str_extract(path, "\\d{8}")
 ) %>% 
   # Get only one shoe
- dplyr:: filter(str_detect(path, "005772L")) %>%
+ dplyr:: filter(str_detect(path, "060706L")) %>%
   # Get only the first rep
- dplyr:: filter(str_detect(path, "3_1_2")) %>%
+ dplyr:: filter(str_detect(path, "3_1_1")) %>%
   mutate(
     stl = purrr::map(path, function(x) readSTL(x, plot = F) %>% scale(center = T, scale = F))
     ) %>%
@@ -85,7 +85,7 @@ nr2<-nrow(shoe2)
 
 
 
-
+Now we are going to start working with a specfic shoe (Shoe ID 048) as it has been a large number of steps, and hopefully has significant wear, in order for the initial observations and detection a bit easier
 
 Ploting the shoes over time to see how they have decayed. 
 
@@ -101,16 +101,122 @@ purrr::walk2(shoe1$resid, shoe1$date, function(x, y) {
 ```
 
 
-```{r shoe-over-time2, rgl = TRUE, dev = 'png', fig.width = 10, fig.height = nr*10/mean(single_shoe$asp_ratio), out.width = "100%"}
-open3d(windowRect = c(0, 0, 1000, nr2*round(1000/mean(shoe1$asp_ratio))), zoom = .5)
+```{r}
+#grabbing the first shoe scan of 048
+stl_file048 <- list.files("../data-raw", pattern = ".stl", full.names = T)
+stl_file_path048 <- stl_file048[str_detect(stl_file048, "048462L")][1]
+stl048 <- readSTL(con = stl_file_path048, ascii = F, plot = F)
+
+stl_centered048 <- scale(stl048, center = T, scale = F)
+
+```
+
+
+```{r convenience-objects}
+# get aspect ratio and ranges
+asp_ranges048 <- apply(stl_centered048, 2, function(x) diff(range(x)))
+asp_ratio048 <- asp_ranges048[1]/asp_ranges048[2] # This actually isn't correct - need to use pca or something to get reasonable surface rotation matrix?
+```
+
+
+
+
+
+```{r surface-setup}
+spline_degs048 <- purrr::map(1:8, ~mba.points(stl_centered048, stl_centered048[,1:2], asp_ratio048, 1, h = .)[[1]])
+np048 <- length(spline_degs048)
+nr048 <- ceiling(np048/2)
+nc048 <- 2
+```
+
+
+Showing the hierarchiacal levels of detail of shoe 048
+
+
+
+```{r surface-plot, rgl = TRUE, dev = 'png', fig.width = (nc * 1000)/100, fig.height = nr * round(1000 / asp_ratio)/100, out.width = "100%"}
+rmat048 <- structure(c(0.945378839969635, -0.203441321849823, -0.254675090312958, 
+                    0, -0.176523759961128, 0.337278544902802, -0.924700558185577, 
+                    0, 0.274019628763199, 0.919150471687317, 0.28294575214386, 0, 
+                    0, 0, 0, 1), .Dim = c(4L, 4L))
+
+open3d(windowRect = c(0, 0, nc048 * 1000, nr048 * round(1000 / asp_ratio048)), zoom = .5)
 Sys.sleep(3)
-mfrow3d(nr = nr2, nc = 1, byrow = T, sharedMouse = T)
-purrr::walk2(shoe2$resid, shoe2$date, function(x, y) {
-  triangles3d(x, col = "cyan", aspect = "iso")
-  title3d(y)
+mfrow3d(nr = nr048, nc = nc048, byrow = T, sharedMouse = T)
+purrr::walk(1:length(spline_degs048), function(x) {
+  rgl::triangles3d(spline_degs048[[x]], col = "cyan", aspect = "iso")
+  title3d(sprintf("Hierarchical Levels: %d", x))
+  view3d(userMatrix = rmat, zoom = .5)
+  next3d(clear = F)
+})
+```
+
+To match the shoes, we are going to try and allign with heirachical level 5, as it has some detail in the overall form of the soul of the shoe. Now pulling out the fifth level: 
+
+
+
+
+Now this the first scan of the shoe, we now want to do the fourth scan as well (as the most deteriartion will occur after the most number of steps. 
+
+```{r}
+#grabbing the fourth shoe scan of 048
+stl_file_path048_4 <- stl_file048[str_detect(stl_file048, "048462L")][4]
+stl048_4 <- readSTL(con = stl_file_path048_4, ascii = F, plot = F)
+
+stl_centered048_4 <- scale(stl048_4, center = T, scale = F)
+
+```
+
+
+```{r convenience-objects}
+# get aspect ratio and ranges
+asp_ranges048_4 <- apply(stl_centered048_4, 2, function(x) diff(range(x)))
+asp_ratio048_4 <- asp_ranges048_4[1]/asp_ranges048_4[2] # This actually isn't correct - need to use pca or something to get reasonable surface rotation matrix?
+```
+
+
+
+
+
+```{r surface-setup}
+spline_degs048_4 <- purrr::map(1:8, ~mba.points(stl_centered048_4, stl_centered048_4[,1:2], asp_ratio048_4, 1, h = .)[[1]])
+np048_4 <- length(spline_degs048_4)
+nr048_4 <- ceiling(np048_4/2)
+nc048_4 <- 2
+```
+
+
+Showing the hierarchiacal levels of detail of shoe 048 scan 4
+
+```{r surface-plot, rgl = TRUE, dev = 'png', fig.width = (nc * 1000)/100, fig.height = nr * round(1000 / asp_ratio)/100, out.width = "100%"}
+rmat048_4 <- structure(c(0.945378839969635, -0.203441321849823, -0.254675090312958, 
+                    0, -0.176523759961128, 0.337278544902802, -0.924700558185577, 
+                    0, 0.274019628763199, 0.919150471687317, 0.28294575214386, 0, 
+                    0, 0, 0, 1), .Dim = c(4L, 4L))
+
+open3d(windowRect = c(0, 0, nc048_4 * 1000, nr048_4 * round(1000 / asp_ratio048_4)), zoom = .5)
+Sys.sleep(3)
+mfrow3d(nr = nr048_4, nc = nc048_4, byrow = T, sharedMouse = T)
+purrr::walk(1:length(spline_degs048_4), function(x) {
+  rgl::triangles3d(spline_degs048_4[[x]], col = "cyan", aspect = "iso")
+  title3d(sprintf("Hierarchical Levels: %d", x))
+  view3d(userMatrix = rmat, zoom = .5)
   next3d(clear = F)
 })
 ```
 
 
+Now taking the fifth level: 
+
+
+
+
+
+
+
+
+
+ Now we want to allign the hierarchial levels first at level 5. 
+ 
+ 
 
