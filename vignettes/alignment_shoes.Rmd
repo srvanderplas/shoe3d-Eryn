@@ -218,6 +218,36 @@ view3d(userMatrix = shoe_flip_angle, zoom = .5)
 ```
 
  Now we want to allign the hierarchial levels first at level 5. 
+ 
+
+## Ideas on how to align 
+
+Note: With these alignment processes we are assuming that the shoe size does not change with wear and that we are not aligning across pairs of shoes. 
+
+1. Compare D2 shape distribution
+
+
+
+
+
+
+
+
+
+
+2. Comparing the skeletal and topological structure 
+
+
+
+
+
+
+
+
+
+
+3. Rendering 2D silhouettes from each viewing angle of two models, and get rotation which has minimum error summing from all viewing angles using shape marching algorithms.
+
 
 
 
