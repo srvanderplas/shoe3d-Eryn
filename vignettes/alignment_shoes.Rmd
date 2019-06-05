@@ -237,10 +237,104 @@ Note: With these alignment processes we are assuming that the shoe size does not
 
 2. Comparing the skeletal and topological structure 
 
+To use this, we can start by using the package arothron (I'm not 100% sure how it works but we will give it a go to start with)
+
+###Using the package Arothron 
+
+
+```{r}
+#install the package 
+library(Arothron)
+```
+
+
+```{r}
+#this takes forever... like a reallllllly long tim
+#aro.clo.points(reference=stl_centered048, target=stl_centered048_4)
+```
+
+
+
+First we need to make our file a mesh object: 
+
+```{r plot-stl-mesh, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
+stl_mesh048 <- vcgImport(stl_file_path048, clean = T)
+plot3d(stl_mesh048, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+
+
+```{r}
+reg_mesh048 <- vcgUniformRemesh(stl_mesh048, voxelSize = .5, multiSample = T, mergeClost = T)
+```
+
+
+
+```{r plot-stl-mesh, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
+stl_mesh048_4 <- vcgImport(stl_file_path048_4, clean = T)
+plot3d(stl_mesh048_4, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+
+
+```{r}
+reg_mesh048_4 <- vcgUniformRemesh(stl_mesh048_4, voxelSize = .5, multiSample = T, mergeClost = T)
+```
 
 
 
 
+
+
+So now we have a mesh object. Now we are going to test some of the package functions to see there uses 
+
+```{r}
+barycenter048<-bary.mesh(reg_mesh048)
+barycenter048_4<-bary.mesh(reg_mesh048_4)
+```
+
+
+
+
+```{r}
+pov048<-grid_pov(reg_mesh048, expand = 1)
+```
+
+
+
+
+
+Adding noise to the mesh object (this will be helpful later when we want to use more degraded images to test the functions)
+
+
+
+```{r}
+noised048<-noise.mesh(reg_mesh048, noise = 0.025, seed = 123)
+plot3d(noised048, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+
+
+
+
+
+centering the mesh on the barymass 
+```{r}
+centered048<-trasf.mesh(reg_mesh048,barycenter = barycenter048)
+centered048_4<-trasf.mesh(reg_mesh048_4,barycenter = barycenter048_4)
+#plot3d(centered048, aspect = "iso", col = "blue")
+#view3d(userMatrix = shoe_flip_angle, zoom = .5)
+```
+
+
+
+```{r}
+#this takes forever... like a reallllllly long tim
+ver_pos<-aro.clo.points(reference=centered048, target=centered048_4)
+```
 
 
 
