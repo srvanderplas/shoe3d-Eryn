@@ -338,6 +338,41 @@ ver_pos<-aro.clo.points(reference=centered048, target=centered048_4)
 
 
 
+now plotting that matrix: 
+```{r}
+as.data.frame(ver_pos)%>%
+  ggplot(mapping = aes(x=position, y=distances))+geom_point()
+```
+
+Im not reall sure how to read this... 
+
+
+
+
+
+```{r}
+dec.curve(stl_centered048, mag=3, plot = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+###Using the package Morpho
+
+```{r}
+#install.packages("Morpho")
+library(Morpho)
+```
+
+
+
 
 
 3. Rendering 2D silhouettes from each viewing angle of two models, and get rotation which has minimum error summing from all viewing angles using shape marching algorithms.
