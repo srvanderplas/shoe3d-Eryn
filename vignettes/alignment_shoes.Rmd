@@ -348,18 +348,9 @@ Im not reall sure how to read this...
 
 
 
-
-
 ```{r}
-dec.curve(stl_centered048, mag=3, plot = TRUE)
+grid_pov(reg_mesh048)
 ```
-
-
-
-
-
-
-
 
 
 
@@ -373,6 +364,12 @@ library(Morpho)
 
 
 
+```{r}
+plotNormals(reg_mesh048)
+```
+
+
+
 
 
 3. Rendering 2D silhouettes from each viewing angle of two models, and get rotation which has minimum error summing from all viewing angles using shape marching algorithms.
@@ -381,6 +378,59 @@ library(Morpho)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##Learning how mesh works 
+
+We know that mesh fills holes and changes the shape of the shoe, but we want to know by how much in order to account for where and how much our error is. 
+
+The origional stl file: 
+
+```{r}
+suma(stl_centered048)
+```
+
+
+First way to mesh: using vcgUniformRemesh 
+
+```{r}
+meshInfo(reg_mesh048)
+```
+
+
+
+```{r}
+#this function finds the center of each triangle of a mesh object 
+vcgBary(reg_mesh048)
+```
  
  
  
