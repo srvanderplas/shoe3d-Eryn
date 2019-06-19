@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
 rgl::setupKnitr()
 ```
 
+
 ```{r setup} 
 #adding packages prior to use
 library(shoe3d)
@@ -21,6 +22,25 @@ library(rgl)
 library(Rvcg) 
 library(MBA) 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r}
@@ -164,7 +184,7 @@ Now this the first scan of the shoe, we now want to do the fourth scan as well (
 
 ```{r}
 #grabbing the fourth shoe scan of 048
-stl_file_path048_4 <- stl_file048[str_detect(stl_file048, "048462L")][4]
+stl_file_path048_4 <- stl_file048[str_detect(stl_file048, "048462L")][8]
 stl048_4 <- readSTL(con = stl_file_path048_4, ascii = F, plot = F)
 
 stl_centered048_4 <- scale(stl048_4, center = T, scale = F)
@@ -415,26 +435,47 @@ We know that mesh fills holes and changes the shape of the shoe, but we want to 
 The origional stl file: 
 
 ```{r}
-suma(stl_centered048)
+head(stl_centered048)
 ```
 
 
-First way to mesh: using vcgUniformRemesh 
+First way to mesh: using vcgImport
 
 ```{r}
-meshInfo(reg_mesh048)
+meshInfo(stl_mesh048)
 ```
 
 
 
 ```{r}
 #this function finds the center of each triangle of a mesh object 
-vcgBary(reg_mesh048)
+vcgBary(stl_mesh048)
+```
+ 
+now this is the same shoe, and same scan but with VcgUniformReg
+
+```{r}
+meshInfo(reg_mesh048)
+```
+
+ 
+ Well we can see that just by resampling the mesh uniformly, we get a larger number of vertices and faces, but smooothing does not change the number. 
+ 
+ 
+```{r}
+smoothshoe<-vcgSmooth(stl_mesh048)
+plot3d(smoothshoe, aspect = "iso", col = "red")
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
 ```
  
  
+```{r}
+meshInfo(smoothshoe)
+```
  
+
  
- 
- 
+```{r}
+
+```
 
