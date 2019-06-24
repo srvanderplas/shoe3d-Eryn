@@ -13,10 +13,16 @@ Note: For this alignment we will be assuming two things:
 
 First step is to set up a file path to the data folder. Then we want to look at the change overtime a specific shoe, so we need to grab the shoe scans over time. Using the function *shoe_grab* to grab the scans of a given shoe ID, specify the id number of a shoe you want to look at, (Make sure you have access to the data, follow the steps on the README for more information. For more information on the shoe data, see **Longituidinal_Shoe_Study**), and turns the given shoe into mesh objects to do further analysis. 
 
+For example: 
+
+```{r}
+shoe05_1<-shoe_grab(shoeid = "005772L", scandate = "20171031",filepath="../data-raw")
+```
 
 
 
 
+###Alignment 
 
 
 

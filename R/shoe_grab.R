@@ -5,27 +5,29 @@
 #'
 #' @description This fuction creates a mesh object of a specified shoe from the data.raw folder
 #'
-#' @param id the shoe id in the form of number followed by R or L to signify the shoe in question, when imputting this make sure to include ""
+#' @param filepath the file path to the shoe
+#' @param shoeid the shoe id in the form of number followed by R or L to signify the shoe in question, when imputting this make sure to include ""
 #' @param scandate the date at which the shoe was scanned in the form of yearmonthday, when imputting this make sure to include ""
 #'
 #' @return a triangle mesh object ( a large mesh3d )
 #'
 #'
 #' @importFrom Rvcg
-#' @importFrom tidyverse
+#' @importFrom stringr
 
 
 
 
 
 
-shoe_grab<- function(shoeid,scandate){
+
+shoe_grab<- function(shoeid,scandate, filepath){
   #function input checks
 
 
   #setting up the file path to the data. This assumes that the file you want is in the folder labled data-raw
   #this will only work on study shoes
-stl_files <- list.files("./data-raw", pattern = ".stl", full.names = T)
+stl_files <- list.files( filepath, pattern = ".stl", full.names = T)
 
   #grabbing a single shoe
 shoe_paths <- stl_files[str_detect(stl_files, shoeid)]
