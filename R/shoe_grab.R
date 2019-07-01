@@ -19,32 +19,31 @@
 
 
 
-shoe_grab<- function(shoeid,scandate=NULL, filepath){
-  #function input checks
+shoe_grab <- function(shoeid, scandate = NULL, filepath) {
+  # function input checks
 
 
-  #setting up the file path to the data.
-stl_files <- list.files( filepath, pattern = ".stl", full.names = T)
-        #checking to see if the folder containing the data is not empty
-          assertthat::not_empty(stl_files)
+  # setting up the file path to the data.
+  stl_files <- list.files(filepath, pattern = ".stl", full.names = T)
+  # checking to see if the folder containing the data is not empty
+  assertthat::not_empty(stl_files)
 
 
-  #grabbing a single shoe
-shoe_paths <- stl_files[str_detect(stl_files, shoeid)]
-shoePath<-shoe_paths[str_detect(shoe_paths, "3_1_1")]
-shoe<-shoePath[str_detect(shoePath, scandate)]
+  # grabbing a single shoe
+  shoe_paths <- stl_files[str_detect(stl_files, shoeid)]
+  shoePath <- shoe_paths[str_detect(shoe_paths, "3_1_1")]
+  shoe <- shoePath[str_detect(shoePath, scandate)]
 
-        #checking to see if the file exists
-          assertthat::see_if(file.exists(shoe))
-
-
-#turning it into a mesh object
-shoe_mesh <- Rvcg::vcgImport(shoe, clean = T)
-        #Checking that it is a mesh3d object
-          assertthat::assert_that(class(shoe_mesh)=="mesh3d")
+  # checking to see if the file exists
+  assertthat::see_if(file.exists(shoe))
 
 
-#returning a mesh3d object
-return(shoe_mesh)
+  # turning it into a mesh object
+  shoe_mesh <- Rvcg::vcgImport(shoe, clean = T)
+  # Checking that it is a mesh3d object
+  assertthat::assert_that(class(shoe_mesh) == "mesh3d")
 
+
+  # returning a mesh3d object
+  return(shoe_mesh)
 }
