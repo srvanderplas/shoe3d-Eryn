@@ -29,20 +29,6 @@ library(MBA)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 #setting up file path 
 stl_files <- list.files("../data-raw", pattern = ".stl", full.names = T)

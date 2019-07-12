@@ -73,7 +73,7 @@ writeSTL(con = centered_tmp)
 ```
 
 ```{r plot-stl-dynamic, fig.width = 8, fig.height = 4, out.width = "100%"}
-# How to plot:
+
 scene %>%
   rglwidget(elementId = "shoeSTL")
 ```
@@ -84,7 +84,7 @@ scene %>%
 stl_mesh <- vcgImport(centered_tmp, clean = T)
 plot3d(stl_mesh, aspect = "iso", col = "red")
 view3d(userMatrix = shoe_flip_angle, zoom = .5)
-```
+````
 
 `Rvcg` has a `vcgUniformRemesh` function - one problem we'll have when comparing two stl files is that the coordinate system will be different. One option might be to interpolate the STL file onto a finely-spaced 3d grid. I'm not sure if that's what this is doing though...
 ```{r plot-regular-mesh, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%", cache = T, eval = F}
@@ -262,3 +262,25 @@ Still have to figure out how to correctly orient this...
 ## Other stuff to Investigate:
 
 - [rayshader](https://www.tylermw.com/3d-printing-rayshader/) - package for generating stl files that are ready for printing. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
