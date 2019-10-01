@@ -28,4 +28,6 @@ shoe05_3<-shoe05[[1]][["stl"]][[3]]
 
 ###Alignment 
 
+At first we wanted to try to simplify the mesh object to just the basic shape in order have simplicity when aligning, however the problem was realized that we are using a prediction to allign rather than the shoe, 
+
 

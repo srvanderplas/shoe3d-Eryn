@@ -1,5 +1,5 @@
 ---
-title: "Allignment of 3D Shoe Scans"
+title: "What we have tried"
 output: html_document
 ---
 
