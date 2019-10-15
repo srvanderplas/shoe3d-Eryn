@@ -1,0 +1,32 @@
+---
+title: "PC"
+author: "Eryn Blagg"
+date: "10/15/2019"
+output: pdf_document
+---
+
+
+Start with a coordinate 
+```{r}
+testshoe<-shoe_coord(shoe05_1)
+```
+
+```{r}
+testpca<-prcomp(testshoe, center = TRUE,scale. = TRUE)
+```
+
+```{r}
+summary(testpca)
+```
+
+```{r}
+rotat<-testpca$rotation
+rotat
+```
+
+
+
+
+
+
+
