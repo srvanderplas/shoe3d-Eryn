@@ -49,7 +49,9 @@ if(is.null(verts))  {
     ungroup(idx)%>%
     tidyr::spread(key="vertex", value=idx) %>%
     dplyr::filter(!is.na(V1) & !is.na(V2) & !is.na(V3))}
-
+#checking
+assertthat::not_empty(verts)
+assertthat::is.data.frame(verts)
 
 vert_long <- vert %>%
   select(-triangle_id) %>%
@@ -62,6 +64,8 @@ vert_coords <- centeredshoe %>%
   magrittr::set_colnames(c("x", "y", "z", "idk")) %>%
   as_tibble() %>%
   mutate(idx = 1:n())
+
+
 x <- left_join(vert_long, vert_coords)%>% select(-idk)%>% select(-idx)
 
 hul<-geometry::convhulln(x, output.options = c("p", "Fx"),
