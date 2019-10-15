@@ -51,7 +51,7 @@ if(is.null(verts))  {
     dplyr::filter(!is.na(V1) & !is.na(V2) & !is.na(V3))}
 #checking
 assertthat::not_empty(verts)
-assertthat::is.data.frame(verts)
+
 
 vert_long <- vert %>%
   select(-triangle_id) %>%
