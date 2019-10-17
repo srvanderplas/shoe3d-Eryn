@@ -35,7 +35,6 @@ stl_files <- list.files("../data-raw", pattern = ".stl", full.names = T)
 ```
 
 
-
 The idea of allignment is to take the most basic features, allign them, then by adding complexity of the soul, further allign the two different shoes. The idea is that we want to take a lower detail scan of shoe, allign it, then by adding complexity we can further allign the shoes. 
 
 ```{r}
