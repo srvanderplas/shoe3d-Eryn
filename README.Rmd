@@ -29,15 +29,17 @@ To start with, I copied `005*` and `002*` left shoe stl files into `data-raw/`
 #usethis::use_data_raw() # set up directory
 
 # this is the file path on bigfoot, but it won't work on windows (or a personal machine).
-#mounting smb:
+# lss_location <- file.path("/lss/research/csafe-shoeprints/ShoeImagingPermanent/") # Linux version
 
+#mounting smb:
 #install.packages("curl")
 #this still isnt working? Email CSSM and waiting for their response 
 require("curl")
+smb_location <- "smb://las-dfs-01.las.iastate.edu/lss/research/csafe-shoeprints/ShoeImagingPermanent"
 handle <- new_handle()
 handle_setopt(handle, username = "eblagg")
 handle_setopt(handle, password = "") # If needed
-request <- curl_fetch_memory("smb://las-dfs-01.las.iastate.edu/lss/research/csafe-shoeprints/ShoeImagingPermanent", handle = handle)
+request <- curl_fetch_memory(smb_location, handle = handle)
 contents <- rawToChar(request$content)
 
 lss_location <- file.path("smb://las-dfs-01.las.iastate.edu","/lss", "research","csafe-shoeprints", "ShoeImagingPermanent") 
