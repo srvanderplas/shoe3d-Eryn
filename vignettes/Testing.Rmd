@@ -1,0 +1,166 @@
+---
+title: "Practice shoe"
+author: "Eryn Blagg"
+date: "10/25/2019"
+output: html_document
+---
+
+
+
+```{r setup}
+library(shoe3d)
+library(tidyverse)
+library(rgl)
+library(Rvcg) # package for working with 3d meshes in R
+library(MBA) # Spline regression
+```
+
+Importing the shoes: (Using this since the shoes do not follow the same format as shoe grab)
+```{r}
+stl_new <- list.files("~/Documents/ISU/CSAFE/Shoe_Scans/My_Scans", pattern = ".stl", full.names = T)
+stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
+sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
+stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][2]
+sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
+```
+
+
+```{r}
+
+sony1shoe<-shoe_coord(sony1)
+sony2shoe<-shoe_coord(sony2)
+```
+
+
+
+```{r}
+sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
+```
+
+
+
+```{r}
+sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
+```
+
+```{r}
+rgl::plot3d(sony1pca$x, aspect="iso")
+rgl::plot3d(sony2pca$x*matrix(c(1, 1, -1), byrow = T, nrow = nrow(sony2pca$x), ncol = 3), aspect="iso", col="blue", add=TRUE)
+```
+
+
+Now with less vertexes: 
+```{r}
+
+sony1low<-shoe_coord(sony1, verts = 7)
+sony2low<-shoe_coord(sony2, verts = 7)
+```
+
+
+                                                
+```{r}
+sony1lowpca<-prcomp(sony1low, center = TRUE,scale. = FALSE)
+```
+
+
+
+```{r}
+sony2lowpca<-prcomp(sony2low, center = TRUE,scale. = FALSE)
+```
+
+```{r}
+rgl::plot3d(sony1lowpca$x, aspect="iso")
+rgl::plot3d(sony2lowpca$x*matrix(c(1, 1, -1), byrow = T, nrow = nrow(sony2lowpca$x), ncol = 3), aspect="iso", col="grey", add=TRUE)
+```
+
+
+
+
+Trying the Asics
+
+```{r}
+stl_new <- list.files("~/Documents/ISU/CSAFE/Shoe_Scans/My_Scans", pattern = ".stl", full.names = T)
+stl_file_pathA1 <- stl_new[str_detect(stl_new, "AsicL")][1]
+Asic1 <- Rvcg::vcgImport(stl_file_pathA1, clean = T)
+stl_file_pathA2 <- stl_new[str_detect(stl_new, "AsicL")][2]
+Asic2 <- Rvcg::vcgImport(stl_file_pathA2, clean = T)
+```
+
+
+```{r}
+
+Asic1shoe<-shoe_coord(Asic1, vert=7)
+Asic2shoe<-shoe_coord(Asic2, vert=7)
+```
+
+
+
+```{r}
+Asic1pca<-prcomp(Asic1shoe, center = TRUE,scale. = FALSE)
+```
+
+
+
+```{r}
+Asic2pca<-prcomp(Asic2shoe, center = TRUE,scale. = FALSE)
+```
+
+```{r}
+rgl::plot3d(Asic1pca$x, aspect="iso")
+rgl::plot3d(Asic2pca$x, aspect="iso", col="blue", add=TRUE)
+```
+
+
+
+Adias 
+
+```{r}
+adias <-shoe_grab(shoeid = "002054L",scandate = NULL ,filepath="../data-raw")
+```
+
+```{r}
+shoe02_1<-adias[[1]][["stl"]][[1]]
+shoe02_3<-adias[[1]][["stl"]][[3]]
+```
+
+
+```{r}
+Adias1shoe<-shoe_coord(shoe02_1)
+Adias3shoe<-shoe_coord(shoe02_3)
+```
+
+```{r}
+Adias1pca<-prcomp(Adias1shoe, center = TRUE,scale. = FALSE)
+```
+
+
+
+```{r}
+Adias3pca<-prcomp(Adias3shoe, center = TRUE,scale. = FALSE)
+```
+
+
+```{r}
+rgl::plot3d(Adias1pca$x, aspect="iso")
+rgl::plot3d(Adias3pca$x*matrix(c(1, -1, -1), byrow = T, nrow = nrow(Adias3pca$x), ncol = 3), aspect="iso", col="grey", add=TRUE)
+```
+
+
+
+
+
+
+Different wearers but same size shoe 
+Adias
+34 and 27
+
+
+
+
+
+
+Nike 
+5 and 6 
+
+
+

@@ -15,7 +15,7 @@ First step is to set up a file path to the data folder. Then we want to look at 
 
 When specifing an scan date, the function will output a single shoe where as if scandate is NULL, the function will output a list of all of the shoes containing the specified id. Then you can call each shoe by referencing the specific shoe using [[i]]
 
-For example
+For example: 
 ```{r}
 shoe05<-shoe_grab(shoeid = "005772L", scandate = NULL ,filepath="../data-raw")
 ```
@@ -25,9 +25,18 @@ then pulling out a single shoe
 shoe05_3<-shoe05[[1]][["stl"]][[3]]
 ```
 
+A triangle mesh object is made up of the following parts, sufaces, polygons, faces, edges and vertices.
+(intert drawing)
 
 ###Alignment 
 
-At first we wanted to try to simplify the mesh object to just the basic shape in order have simplicity when aligning, however the problem was realized that we are using a prediction to allign rather than the shoe, 
+Some background: 
+At first we wanted to try to simplify the mesh object to just the basic shape in order have simplicity when aligning, however the problem was realized that we are using a prediction to allign rather than the shoe. The next "attempt" at alignment came from a package called morph. (add information about morph). In order to use this package, we needed to transform the data from a mesh object into a plane of points. In order to do this, we greated the function *shoe_coord*. This function takes a triangle mesh object, and looks at the vertices that make up each triangle. With a specific amount of vertices specified using the specification vert, *shoe_coord*, takes these vertices and maps them onto a x,y,z coordinate plane. Then using this coordinate plane, the allignment process began. 
+
+Principal Component Analysis: 
+The basic idea of principal component analysis is to take a dataset with many variables, and simplify that dataset by turning the original variables into a smaller number of "Principal Components". These principal components are the underlying structure in the data. Taking that data and giving a vector in directions where there is the most variance. Taking these egienvectors as the data, we can get a "flattened" version of our origianl shoe. (this needs to be written better, future me problem, also have a graphic explaining it)
+
+Once a 
+
 
 
