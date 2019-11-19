@@ -2,6 +2,9 @@
 title: "Shoe Alignment"
 output: html_document
 ---
+```{r setup, echo = T}
+library(shoe3d)
+```
 
 ## The Alignment of shoes 
 
