@@ -17,7 +17,7 @@ Imports:
     dplyr,
     magrittr,
     purrr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 URL: https://github.com/srvanderplas/shoe3d
 BugReports: https://github.com/srvanderplas/shoe3d/issues
 Suggests: 

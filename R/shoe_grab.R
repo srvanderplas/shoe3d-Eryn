@@ -12,8 +12,10 @@
 #' @return a triangle mesh object ( a large mesh3d )
 #'
 #'
-#' @importFrom Rvcg
-#' @importFrom stringr
+#' @importFrom Rvcg vcgImport
+#' @importFrom stringr str_detect
+#' @importFrom tibble tibble
+#' @importFrom purrr map
 #' @import assertthat
 
 

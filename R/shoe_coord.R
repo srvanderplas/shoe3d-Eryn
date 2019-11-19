@@ -12,9 +12,12 @@
 #' @return matrix
 #'
 #'
-#' @importFrom Rvcg
-#' @importFrom geometry
-#' @importFrom Arothron
+#' @importFrom geometry convhulln
+#' @importFrom Arothron trasf.mesh bary.mesh
+#' @import dplyr
+#' @importFrom tidyr gather spread
+#' @importFrom tibble tibble as_tibble
+#' @importFrom magrittr extract2 set_colnames
 #' @import assertthat
 
 shoe_coord <- function(shoe, verts = NULL) {
