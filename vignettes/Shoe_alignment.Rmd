@@ -3,13 +3,13 @@ title: "Shoe Alignment"
 output: html_document
 ---
 
-##The Alignment of shoes 
+## The Alignment of shoes 
 
 Note: For this alignment we will be assuming two things:
 1) We have the full print of the shoe
 2) A shoe is not going to change sizes from being worn. That is, a size 8 shoe, will always be a size 8 shoe. 
 
-###Setup
+### Setup
 
 First step is to set up a file path to the data folder. Then we want to look at the change overtime a specific shoe, so we need to grab the shoe scans over time. Using the function *shoe_grab* to grab the scans of a given shoe ID, specify the id number of a shoe you want to look at, (Make sure you have access to the data, follow the steps on the README for more information. For more information on the shoe data, see **Longituidinal_Shoe_Study**), and turns the given shoe into mesh objects to do further analysis. 
 
@@ -28,7 +28,7 @@ shoe05_3<-shoe05[[1]][["stl"]][[3]]
 A triangle mesh object is made up of the following parts, sufaces, polygons, faces, edges and vertices.
 (intert drawing)
 
-###Alignment 
+### Alignment 
 
 Some background: 
 At first we wanted to try to simplify the mesh object to just the basic shape in order have simplicity when aligning, however the problem was realized that we are using a prediction to allign rather than the shoe. The next "attempt" at alignment came from a package called morph. (add information about morph). In order to use this package, we needed to transform the data from a mesh object into a plane of points. In order to do this, we greated the function *shoe_coord*. This function takes a triangle mesh object, and looks at the vertices that make up each triangle. With a specific amount of vertices specified using the specification vert, *shoe_coord*, takes these vertices and maps them onto a x,y,z coordinate plane. Then using this coordinate plane, the allignment process began. 
