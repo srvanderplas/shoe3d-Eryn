@@ -1,5 +1,5 @@
 #' @name shoe_coord
-#' @export dataframe
+#' @export
 #'
 #' @title  Single Shoe coordinates of vertext
 #'
@@ -9,7 +9,7 @@
 #' @param verts the number of edges to each vertex (if na does full shoe) to filter out of the shoe
 #'
 #'
-#' @return matrix
+#' @return data.frame
 #'
 #'
 #' @importFrom geometry convhulln
