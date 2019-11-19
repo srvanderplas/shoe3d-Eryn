@@ -1,5 +1,5 @@
 #' @name shoe_grab
-#' @export mesh3d
+#' @export
 #'
 #' @title  Single Shoe Extractor
 #'
