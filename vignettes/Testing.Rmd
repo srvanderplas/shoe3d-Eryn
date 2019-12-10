@@ -25,6 +25,8 @@ sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
 ```
 
 
+
+
 ```{r}
 
 sony1shoe<-shoe_coord(sony1)
@@ -35,8 +37,26 @@ sony2shoe<-shoe_coord(sony2)
 
 ```{r}
 sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
+summary(sony1pca)
+```
+```{r}
+rotattionmat<-rbind(cbind(sony1pca$rotation, c(0, 0, 0)), c(0, 0, 0, 1))
+rotattionmat1<-rbind(cbind(sony2pca$rotation, c(0, 0, 0)), c(0, 0, 0, 1))
 ```
 
+```{r}
+rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
+par3d(userProjection=rotattionmat)
+rgl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
+par3d(userProjection=rotattionmat1)
+```
+
+
+
+
+```{r}
+head(sony1pca$x)
+```
 
 
 ```{r}
@@ -146,6 +166,20 @@ rgl::plot3d(Adias3pca$x*matrix(c(1, -1, -1), byrow = T, nrow = nrow(Adias3pca$x)
 ```
 
 
+```{r}
+shoe_flip_angle <- structure(
+  c(-0.999475359916687, -0.0319919027388096, -0.0030277690384537, 
+     0, -0.0320942476391792, 0.99845552444458, 0.0450587198138237, 
+     0, 0.0015826690942049, 0.0451280698180199, -0.998970746994019, 
+     0, 0, 0, 0, 1), .Dim = c(4L, 4L)) 
+
+# How to plot:
+open3d()
+rgl::triangles3d(shoe02_1, aspect = "iso", col = "red")+
+view3d(userMatrix = shoe_flip_angle, zoom = .5)
+
+scene <- scene3d()
+```
 
 
 

@@ -51,7 +51,7 @@ asp_ratio <- asp_ranges[1]/asp_ranges[2] # This actually isn't correct - need to
 
 ```{r plot-stl, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%"}
 
-# obtained interactively w/ par3d()$userMatrix and saved with dput()
+
 shoe_flip_angle <- structure(
   c(-0.999475359916687, -0.0319919027388096, -0.0030277690384537, 
      0, -0.0320942476391792, 0.99845552444458, 0.0450587198138237, 
@@ -84,7 +84,7 @@ scene %>%
 stl_mesh <- vcgImport(centered_tmp, clean = T)
 plot3d(stl_mesh, aspect = "iso", col = "red")
 view3d(userMatrix = shoe_flip_angle, zoom = .5)
-````
+```
 
 `Rvcg` has a `vcgUniformRemesh` function - one problem we'll have when comparing two stl files is that the coordinate system will be different. One option might be to interpolate the STL file onto a finely-spaced 3d grid. I'm not sure if that's what this is doing though...
 ```{r plot-regular-mesh, rgl = TRUE, dev = 'png', fig.width = 8, fig.height = 4, out.width = "100%", cache = T, eval = F}

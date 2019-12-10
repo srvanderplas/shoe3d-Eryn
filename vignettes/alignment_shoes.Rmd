@@ -255,7 +255,7 @@ library(Arothron)
 
 ```{r}
 #this takes forever... like a reallllllly long tim
-#aro.clo.points(reference=stl_centered048, target=stl_centered048_4)
+aro.clo.points(reference=stl_centered048, target=stl_centered048_4)
 ```
 
 
@@ -330,8 +330,8 @@ centering the mesh on the barymass
 ```{r}
 centered048<-trasf.mesh(reg_mesh048,barycenter = barycenter048)
 centered048_4<-trasf.mesh(reg_mesh048_4,barycenter = barycenter048_4)
-#plot3d(centered048, aspect = "iso", col = "blue")
-#view3d(userMatrix = shoe_flip_angle, zoom = .5)
+plot3d(centered048, aspect = "iso", col = "blue")
+\view3d(userMatrix = shoe_flip_angle, zoom = .5)
 ```
 
 
