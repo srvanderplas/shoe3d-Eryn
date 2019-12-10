@@ -13,11 +13,12 @@ library(tidyverse)
 library(rgl)
 library(Rvcg) # package for working with 3d meshes in R
 library(MBA) # Spline regression
+knitr::opts_chunk$set(cache = T)
 ```
 
 Importing the shoes: (Using this since the shoes do not follow the same format as shoe grab)
 ```{r}
-stl_new <- list.files("~/Documents/ISU/CSAFE/Shoe_Scans/My_Scans", pattern = ".stl", full.names = T)
+stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
 stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
 sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
 stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][2]
@@ -79,7 +80,7 @@ rgl::plot3d(sony2lowpca$x*matrix(c(1, 1, -1), byrow = T, nrow = nrow(sony2lowpca
 Trying the Asics
 
 ```{r}
-stl_new <- list.files("~/Documents/ISU/CSAFE/Shoe_Scans/My_Scans", pattern = ".stl", full.names = T)
+stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
 stl_file_pathA1 <- stl_new[str_detect(stl_new, "AsicL")][1]
 Asic1 <- Rvcg::vcgImport(stl_file_pathA1, clean = T)
 stl_file_pathA2 <- stl_new[str_detect(stl_new, "AsicL")][2]
