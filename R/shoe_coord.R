@@ -26,15 +26,12 @@ shoe_coord <- function(shoe, verts = NULL) {
   assertthat::assert_that(class(shoe) == "mesh3d")
   assertthat::is.number(verts)
 
-  # centering the shoe based on the center of mass
-  centeredshoe <- Arothron::trasf.mesh(shoe, barycenter = Arothron::bary.mesh(shoe))
 
-  assertthat::assert_that(class(centeredshoe) == "mesh3d")
 
 
 
   if (!is.null(verts)) {
-    vert <- as.data.frame(t(centeredshoe$it)) %>%
+    vert <- as.data.frame(t(shoe$it)) %>%
       mutate(triangle_id = 1:n()) %>%
       tidyr::gather(-triangle_id, key = "vertex", value = idx) %>%
       group_by(idx) %>%
@@ -46,7 +43,7 @@ shoe_coord <- function(shoe, verts = NULL) {
 
 
   if (is.null(verts)) {
-    vert <- as.data.frame(t(centeredshoe$it)) %>%
+    vert <- as.data.frame(t(shoe$it)) %>%
       mutate(triangle_id = 1:n()) %>%
       tidyr::gather(-triangle_id, key = "vertex", value = idx) %>%
       group_by(idx) %>%
@@ -63,7 +60,7 @@ shoe_coord <- function(shoe, verts = NULL) {
     tidyr::gather(key = V, value = idx) %>%
     select(-V) %>%
     unique()
-  vert_coords <- centeredshoe %>%
+  vert_coords <- shoe %>%
     magrittr::extract2("vb") %>%
     t() %>%
     magrittr::set_colnames(c("x", "y", "z", "idk")) %>%

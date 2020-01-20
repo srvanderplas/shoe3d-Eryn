@@ -54,6 +54,7 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
       )
   }
 
+  shoemesh<-Arothron::trasf.mesh(shoe_mesh, barycenter = Arothron::bary.mesh(shoe_mesh))
   # returning a mesh3d object
-  return(list(shoe_mesh))
+  return(list(shoemesh))
 }

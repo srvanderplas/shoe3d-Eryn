@@ -53,3 +53,7 @@ An example:
 
 
 
+Once you have a rotation matrix from a principal component analysis, we need to turn the eclidean matrix into a homogeneous matrix in order to apply the given rotation to the orginal mesh3d object (so that surface areas can be compared rather than just the points of the verticies in the coordinate plane). 
+
+
+

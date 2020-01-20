@@ -8,7 +8,7 @@ output: html_document
 
 
 ```{r setup}
-library(shoe3d)
+#library(shoe3d)
 library(tidyverse)
 library(rgl)
 library(Rvcg) # package for working with 3d meshes in R
@@ -38,18 +38,37 @@ sony2shoe<-shoe_coord(sony2)
 
 ```{r}
 sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
-summary(sony1pca)
-```
-```{r}
-rotattionmat<-rbind(cbind(sony1pca$rotation, c(0, 0, 0)), c(0, 0, 0, 1))
-rotattionmat1<-rbind(cbind(sony2pca$rotation, c(0, 0, 0)), c(0, 0, 0, 1))
+sony1pca$rotation
+
+
 ```
 
 ```{r}
-rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
-par3d(userProjection=rotattionmat)
-rgl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
-par3d(userProjection=rotattionmat1)
+rotationMatrix(matrix = sony1pca$rotation)
+```
+
+
+
+
+
+
+
+```{r}
+rotattionmat<-rbind(cbind(sony1pca$rotation, c(0, 0, 0)), c(0, 0, 0, 1))
+rotattionmat1<-rbind(cbind(t(sony2pca$rotation), c(0, 0, 0)), c(0, 0, 0, 1))
+```
+
+```{r}
+#FIND A CENTERING??
+sony1tran<-transform3d(sony1, matrix = rotationMatrix(matrix = diag(c(-1,1,1)) %*% sony1pca$rotation))
+sony2tran<-transform3d(sony2, matrix = rotationMatrix(matrix = sony2pca$rotation))
+rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+axes3d()
+#transform3d(sony1, matrix = rotationMatrix(matrix = sony1pca$rotation))
+#par3d(userProjection=rotattionmat)
+#rgl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
+#par3d(userProjection=rotattionmat1)
 ```
 
 
@@ -94,6 +113,47 @@ rgl::plot3d(sony1lowpca$x, aspect="iso")
 rgl::plot3d(sony2lowpca$x*matrix(c(1, 1, -1), byrow = T, nrow = nrow(sony2lowpca$x), ncol = 3), aspect="iso", col="grey", add=TRUE)
 ```
 
+```{r}
+rotattionmata<-rbind(cbind(t(sony1lowpca$rotation), c(0, 0, 0)), c(1, 1, 1, 1))
+rotattionmat1a<-rbind(cbind(t(sony2lowpca$rotation), c(0, 0, 0)), c(1, 1, 1, 1))
+```
+
+```{r}
+rgl::plot3d(sony1low, aspect="iso", col="blue", add=TRUE)
+par3d(userProjection=rotattionmata)
+rgl::plot3d(sony2low, aspect="iso", col="green", add=TRUE)
+par3d(userProjection=rotattionmat1a)
+```
+
+
+
+Trying to switch them to homogeneous coordinates 
+
+
+
+```{r}
+hommat<-asHomogeneous(sony1lowpca$rotation)
+hommat
+```
+
+```{r}
+rgl::plot3d(sony1low, aspect="iso", col="blue", add=TRUE)
+par3d(userProjection=hommat)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -130,6 +190,17 @@ Asic2pca<-prcomp(Asic2shoe, center = TRUE,scale. = FALSE)
 rgl::plot3d(Asic1pca$x, aspect="iso")
 rgl::plot3d(Asic2pca$x, aspect="iso", col="blue", add=TRUE)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -183,19 +254,6 @@ scene <- scene3d()
 ```
 
 
-
-
-Different wearers but same size shoe 
-Adias
-34 and 27
-
-
-
-
-
-
-Nike 
-5 and 6 
 
 
 
