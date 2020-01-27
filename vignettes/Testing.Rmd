@@ -21,8 +21,10 @@ Importing the shoes: (Using this since the shoes do not follow the same format a
 stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
 stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
 sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
+sony1<-Arothron::trasf.mesh(sony1, barycenter = Arothron::bary.mesh(sony1))
 stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][2]
 sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
+sony2<-Arothron::trasf.mesh(sony2, barycenter = Arothron::bary.mesh(sony2))
 ```
 
 
@@ -31,13 +33,31 @@ sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
 ```{r}
 
 sony1shoe<-shoe_coord(sony1)
+
 sony2shoe<-shoe_coord(sony2)
 ```
+
+```{r}
+
+#i have no idea what this is doing... 
+a<-fastKmeans(sony1shoe, 3, iter.max = 10, project = TRUE, threads = 0)
+spheres3d(a$centers)
+```
+
+
+```{r}
+shoeing<-pcAlign(sony1,sony2)
+```
+
+
+
+
 
 
 
 ```{r}
 sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
+sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
 sony1pca$rotation
 
 
@@ -54,14 +74,22 @@ rotationMatrix(matrix = sony1pca$rotation)
 
 
 ```{r}
-rotattionmat<-rbind(cbind(sony1pca$rotation, c(0, 0, 0)), c(0, 0, 0, 1))
-rotattionmat1<-rbind(cbind(t(sony2pca$rotation), c(0, 0, 0)), c(0, 0, 0, 1))
+rotattionmat<-rbind(cbind(sony1pca$rotation, c(1, 1, 1)), c(0, 0, 0, 1))
+rotattionmat1<-rbind(cbind(t(sony2pca$rotation), c(1, 1, 1)), c(0, 0, 0, 1))
 ```
+
+
+```{r}
+rotattionmat%*%t(rotattionmat)
+```
+
+
+
 
 ```{r}
 #FIND A CENTERING??
-sony1tran<-transform3d(sony1, matrix = rotationMatrix(matrix = diag(c(-1,1,1)) %*% sony1pca$rotation))
-sony2tran<-transform3d(sony2, matrix = rotationMatrix(matrix = sony2pca$rotation))
+sony1tran<-transform3d(sony1, matrix = rotattionmat)
+sony2tran<-transform3d(sony2, matrix =rotattionmat1)
 rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
 rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
 axes3d()
@@ -107,6 +135,22 @@ sony1lowpca<-prcomp(sony1low, center = TRUE,scale. = FALSE)
 ```{r}
 sony2lowpca<-prcomp(sony2low, center = TRUE,scale. = FALSE)
 ```
+
+```{r}
+sony1tran<-transform3d(sony1, matrix = rotationMatrix(matrix = diag(c(1,-1,1)) %*% sony1lowpca$rotation))
+sony2tran<-transform3d(sony2, matrix = rotationMatrix(matrix = sony2lowpca$rotation))
+rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+axes3d()
+```
+
+
+
+
+
+
+
+
 
 ```{r}
 rgl::plot3d(sony1lowpca$x, aspect="iso")
