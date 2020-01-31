@@ -38,6 +38,18 @@ sony2shoe<-shoe_coord(sony2)
 ```
 
 ```{r}
+colMeans1 <- colMeans(sony1shoe)
+sony1c <- translate3d(sony1, -colMeans1[1], -colMeans1[2], -colMeans1[3])
+rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+axes3d()
+
+colMeans2 <- colMeans(sony2shoe)
+sony2c <- translate3d(sony2, -colMeans2[1], -colMeans2[2], -colMeans2[3])
+rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+
+```
+
+```{r}
 
 #i have no idea what this is doing... 
 a<-fastKmeans(sony1shoe, 3, iter.max = 10, project = TRUE, threads = 0)
@@ -88,11 +100,20 @@ rotattionmat%*%t(rotattionmat)
 
 ```{r}
 #FIND A CENTERING??
-sony1tran<-transform3d(sony1, matrix = rotattionmat)
-sony2tran<-transform3d(sony2, matrix =rotattionmat1)
+sony1tran<-transform3d(sony1c, matrix = rotationMatrix(matrix = sony1pca$rotation))
+sony2tran<-transform3d(sony2c, matrix =rotationMatrix(matrix = sony2pca$rotation))
+
+rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+
+rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+axes3d()
+
 rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
 rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
 axes3d()
+
 #transform3d(sony1, matrix = rotationMatrix(matrix = sony1pca$rotation))
 #par3d(userProjection=rotattionmat)
 #rgl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
