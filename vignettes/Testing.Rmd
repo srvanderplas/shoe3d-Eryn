@@ -46,11 +46,19 @@ spheres3d(a$centers)
 
 
 ```{r}
-shoeing<-pcAlign(sony1,sony2)
+shoeing<-Morpho::pcAlign(sony1,sony2)
+```
+
+```{r}
+
 ```
 
 
-
+```{r}
+rgl::plot3d(shoeing, aspect="iso", col="green", add=TRUE)
+rgl::plot3d(sony1,aspect="iso", col="blue", add=TRUE)
+axes3d()
+```
 
 
 
