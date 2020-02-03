@@ -1,0 +1,133 @@
+---
+title: "Practice shoe"
+author: "Heike"
+date: "10/25/2019"
+output: html_document
+---
+
+
+
+```{r setup}
+#library(shoe3d)
+library(tidyverse)
+library(rgl)
+library(Rvcg) # package for working with 3d meshes in R
+library(Morpho) 
+library(Arothron)
+#library(MBA) # Spline regression
+knitr::opts_chunk$set(cache = T)
+```
+
+Importing the shoes: (Using this since the shoes do not follow the same format as shoe grab)
+```{r}
+stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
+stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
+sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
+sony1<-Arothron::trasf.mesh(sony1, barycenter = Arothron::bary.mesh(sony1))
+stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][3]
+sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
+sony2<-Arothron::trasf.mesh(sony2, barycenter = Arothron::bary.mesh(sony2))
+```
+
+# get barycenter from meshes and move meshes into bary center
+```{r}
+center3d <- function(mesh, method=barycenter) {
+  bary <- method(mesh) %>% colMeans()
+  translate3d(mesh, -bary[1], -bary[2], -bary[3])
+}
+
+sony1c <- center3d(sony1)
+sony2c <- center3d(sony2)
+
+rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+axes3d()
+
+
+```
+
+# 3d point cloud from mesh
+```{r}
+sony1shoe<-shoe_coord(sony1)
+sony2shoe<-shoe_coord(sony2)
+```
+# rotation matrices based on coordinates
+
+```{r}
+sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
+sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
+```
+
+
+```{r}
+#FIND A CENTERING??
+sony1tran<-transform3d(sony1c, matrix = rotationMatrix(matrix = sony1pca$rotation))
+sony2tran<-transform3d(sony2c, matrix =rotationMatrix(matrix = sony2pca$rotation))
+
+# rotate first scan into pc1, pc2, pc3
+rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+
+# rotate second scan into pc1, pc2, pc3
+rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+axes3d()
+
+# rotated scans
+rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+axes3d()
+
+```
+
+
+# check rotated points for minimal RMSE
+
+```{r}
+rotations <- list(
+  rotationMatrix(matrix=diag(c(1,1,1))),
+  rotationMatrix(matrix=diag(c(-1,1,1))),
+  rotationMatrix(matrix=diag(c(1,-1,1))),
+  rotationMatrix(matrix=diag(c(1,1,-1))),
+  rotationMatrix(matrix=diag(c(1,-1,-1))),
+  rotationMatrix(matrix=diag(c(-1,1,-1))),
+  rotationMatrix(matrix=diag(c(-1,-1,1))),
+  rotationMatrix(matrix=diag(c(-1,-1,-1)))
+)
+
+rgl::plot3d(sony2tran, aspect="iso", col="blue", add=TRUE)
+axes3d()
+rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
+rgl::plot3d(transform3d(sony1tran, matrix = rotations[[3]]), aspect="iso", col="darkgreen", add=TRUE)
+rgl::plot3d(transform3d(sony1tran, matrix = rotations[[4]]), aspect="iso", col="cyan", add=TRUE) # this is the one
+
+
+# july scan compared to first
+rgl::plot3d(transform3d(sony2tran, matrix = rotations[[2]]), aspect="iso", col="blue", add=TRUE)
+axes3d()
+rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
+rgl::plot3d(transform3d(sony1tran, matrix = rotations[[3]]), aspect="iso", col="cyan", add=TRUE) # this one
+rgl::plot3d(transform3d(sony1tran, matrix = rotations[[4]]), aspect="iso", col="darkgreen", add=TRUE) 
+
+
+```
+
+
+# comparison to aligning with Morpho pca
+
+```{r}
+shoeing<-pcAlign(sony1,sony2)
+```
+
+```{r}
+rgl::plot3d(sony2, aspect="iso", col="blue", add=TRUE)
+axes3d()
+rgl::plot3d(shoeing, aspect="iso", col="green", add=TRUE)
+```
+
+Maybe interesting:
+https://courses.cs.washington.edu/courses/cse577/11au/notes/Z12.pdf
+
+https://stackoverflow.com/questions/9065156/how-to-align-two-meshes
+
+

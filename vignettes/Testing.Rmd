@@ -38,10 +38,17 @@ sony2shoe<-shoe_coord(sony2)
 ```
 
 ```{r}
+<<<<<<< HEAD
 #colMeans1 <- colMeans(sony1shoe)
 #sony1c <- translate3d(sony1, -colMeans1[1], -colMeans1[2], -colMeans1[3])
 rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
 rgl::plot3d(sony11, aspect="iso", col="green", add=TRUE)
+=======
+colMeans1 <- colMeans(sony1shoe)
+bary1 <- barycenter(sony1) %>% colMeans()
+sony1c <- translate3d(sony1, -bary1[1], -bary1[2], -bary1[3])
+rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+>>>>>>> bff0c172e7a989d8cfaca6f32a4abfd90ed03a11
 axes3d()
 
 #colMeans2 <- colMeans(sony2shoe)
