@@ -21,13 +21,13 @@ Importing the shoes: (Using this since the shoes do not follow the same format a
 stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
 stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
 sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
-sony1<-Arothron::trasf.mesh(sony1, barycenter = Arothron::bary.mesh(sony1))
+centering<-Arothron::bary.mesh(sony1) #this is added now for the shoe_grab for the longitudinal shoes
+sony1<-translate3d(sony1, -centering[1], -centering[2], -centering[3])
 stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][2]
 sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
-sony2<-Arothron::trasf.mesh(sony2, barycenter = Arothron::bary.mesh(sony2))
+centering<-Arothron::bary.mesh(sony2)
+sony2<-translate3d(sony2, -centering[1], -centering[2], -centering[3])
 ```
-
-
 
 
 ```{r}
@@ -38,14 +38,15 @@ sony2shoe<-shoe_coord(sony2)
 ```
 
 ```{r}
-colMeans1 <- colMeans(sony1shoe)
-sony1c <- translate3d(sony1, -colMeans1[1], -colMeans1[2], -colMeans1[3])
-rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+#colMeans1 <- colMeans(sony1shoe)
+#sony1c <- translate3d(sony1, -colMeans1[1], -colMeans1[2], -colMeans1[3])
+rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony11, aspect="iso", col="green", add=TRUE)
 axes3d()
 
-colMeans2 <- colMeans(sony2shoe)
-sony2c <- translate3d(sony2, -colMeans2[1], -colMeans2[2], -colMeans2[3])
-rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+#colMeans2 <- colMeans(sony2shoe)
+#sony2c <- translate3d(sony2, -colMeans2[1], -colMeans2[2], -colMeans2[3])
+#rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
 
 ```
 

@@ -42,6 +42,8 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
     shoe_mesh <- Rvcg::vcgImport(shoe, clean = T)
     # Checking that it is a mesh3d object
     assertthat::assert_that(class(shoe_mesh) == "mesh3d")
+    centering<-Morpho::berycenter(shoe_mesh)
+    shoemesh<-translate3d(shoe_mesh, -centering[1], -centering[2], -centering[3])
   }
 
   if (is.null(scandate)) {
@@ -52,9 +54,9 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
         exists = file.exists(shoespath),
         stl = purrr::map(Shoe, Rvcg::vcgImport)
       )
+    for(i){ }#get for list
   }
-  centering<-Arothron::bary.mesh(shoe_mesh)
-  shoemesh<-translate3d(sony1, -centering[1], -centering[2], -centering[3])
+
   # returning a mesh3d object
   return(list(shoemesh))
 }
