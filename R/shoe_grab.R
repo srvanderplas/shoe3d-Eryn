@@ -53,8 +53,8 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
         stl = purrr::map(Shoe, Rvcg::vcgImport)
       )
   }
-
-  shoemesh<-Arothron::trasf.mesh(shoe_mesh, barycenter = Arothron::bary.mesh(shoe_mesh))
+  centering<-Arothron::bary.mesh(shoe_mesh)
+  shoemesh<-translate3d(sony1, -centering[1], -centering[2], -centering[3])
   # returning a mesh3d object
   return(list(shoemesh))
 }
