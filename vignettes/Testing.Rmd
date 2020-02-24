@@ -21,13 +21,21 @@ Importing the shoes: (Using this since the shoes do not follow the same format a
 stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
 stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
 sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
-centering<-Arothron::bary.mesh(sony1) #this is added now for the shoe_grab for the longitudinal shoes
+centering<-Morpho::barycenter(sony1) #this is added now for the shoe_grab for the longitudinal shoes
 sony1<-translate3d(sony1, -centering[1], -centering[2], -centering[3])
 stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][2]
 sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
-centering<-Arothron::bary.mesh(sony2)
+centering<-Morpho::barycenter(sony2)
 sony2<-translate3d(sony2, -centering[1], -centering[2], -centering[3])
 ```
+
+
+```{r}
+rgl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
+axes3d()
+```
+
+
 
 
 ```{r}
@@ -38,17 +46,38 @@ sony2shoe<-shoe_coord(sony2)
 ```
 
 ```{r}
-<<<<<<< HEAD
+sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
+sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
+sony1pca$rotation
+sony1tran<-transform3d(sony1, matrix = rotationMatrix(matrix = sony1pca$rotation))
+sony2tran<-transform3d(sony2, matrix =rotationMatrix(matrix = sony2pca$rotation))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 #colMeans1 <- colMeans(sony1shoe)
 #sony1c <- translate3d(sony1, -colMeans1[1], -colMeans1[2], -colMeans1[3])
 rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
 rgl::plot3d(sony11, aspect="iso", col="green", add=TRUE)
-=======
-colMeans1 <- colMeans(sony1shoe)
-bary1 <- barycenter(sony1) %>% colMeans()
-sony1c <- translate3d(sony1, -bary1[1], -bary1[2], -bary1[3])
-rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
->>>>>>> bff0c172e7a989d8cfaca6f32a4abfd90ed03a11
 axes3d()
 
 #colMeans2 <- colMeans(sony2shoe)
@@ -57,20 +86,15 @@ axes3d()
 
 ```
 
-```{r}
-
-#i have no idea what this is doing... 
-a<-fastKmeans(sony1shoe, 3, iter.max = 10, project = TRUE, threads = 0)
-spheres3d(a$centers)
-```
 
 
 ```{r}
+#This works really well...it takes a while but now that the shoes are initially centered, this is also centered 
 shoeing<-Morpho::pcAlign(sony1,sony2)
 ```
 
 ```{r}
-
+str(sony1)
 ```
 
 
@@ -91,14 +115,6 @@ sony1pca$rotation
 
 ```
 
-```{r}
-rotationMatrix(matrix = sony1pca$rotation)
-```
-
-
-
-
-
 
 
 ```{r}
@@ -107,24 +123,18 @@ rotattionmat1<-rbind(cbind(t(sony2pca$rotation), c(1, 1, 1)), c(0, 0, 0, 1))
 ```
 
 
-```{r}
-rotattionmat%*%t(rotattionmat)
-```
-
-
-
 
 ```{r}
 #FIND A CENTERING??
-sony1tran<-transform3d(sony1c, matrix = rotationMatrix(matrix = sony1pca$rotation))
-sony2tran<-transform3d(sony2c, matrix =rotationMatrix(matrix = sony2pca$rotation))
+sony1tran<-transform3d(sony1, matrix = rotationMatrix(matrix = sony1pca$rotation))
+sony2tran<-transform3d(sony2, matrix =rotationMatrix(matrix = sony2pca$rotation))
 
-rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
-rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+#rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
+#rgl::plot3d(sony1tran, aspect="iso", col="lightblue", add=TRUE)
 
-rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
-rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
-axes3d()
+#gl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
+#rgl::plot3d(sony2tran, aspect="iso", col="lightgreen", add=TRUE)
+#axes3d()
 
 rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
 rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
@@ -137,21 +147,18 @@ axes3d()
 ```
 
 
-
-
 ```{r}
-head(sony1pca$x)
-```
-
-
-```{r}
-sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
-```
-
-```{r}
+#this is the orginal point clouds 
 rgl::plot3d(sony1pca$x, aspect="iso")
 rgl::plot3d(sony2pca$x*matrix(c(1, 1, -1), byrow = T, nrow = nrow(sony2pca$x), ncol = 3), aspect="iso", col="blue", add=TRUE)
 ```
+
+
+
+
+
+
+
 
 
 Now with less vertexes: 
@@ -205,83 +212,6 @@ par3d(userProjection=rotattionmata)
 rgl::plot3d(sony2low, aspect="iso", col="green", add=TRUE)
 par3d(userProjection=rotattionmat1a)
 ```
-
-
-
-Trying to switch them to homogeneous coordinates 
-
-
-
-```{r}
-hommat<-asHomogeneous(sony1lowpca$rotation)
-hommat
-```
-
-```{r}
-rgl::plot3d(sony1low, aspect="iso", col="blue", add=TRUE)
-par3d(userProjection=hommat)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Trying the Asics
-
-```{r}
-stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
-stl_file_pathA1 <- stl_new[str_detect(stl_new, "AsicL")][1]
-Asic1 <- Rvcg::vcgImport(stl_file_pathA1, clean = T)
-stl_file_pathA2 <- stl_new[str_detect(stl_new, "AsicL")][2]
-Asic2 <- Rvcg::vcgImport(stl_file_pathA2, clean = T)
-```
-
-
-```{r}
-
-Asic1shoe<-shoe_coord(Asic1, vert=7)
-Asic2shoe<-shoe_coord(Asic2, vert=7)
-```
-
-
-
-```{r}
-Asic1pca<-prcomp(Asic1shoe, center = TRUE,scale. = FALSE)
-```
-
-
-
-```{r}
-Asic2pca<-prcomp(Asic2shoe, center = TRUE,scale. = FALSE)
-```
-
-```{r}
-rgl::plot3d(Asic1pca$x, aspect="iso")
-rgl::plot3d(Asic2pca$x, aspect="iso", col="blue", add=TRUE)
-```
-
-
-
-
-
-
-
-
-
-
-
 
 
 

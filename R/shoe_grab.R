@@ -1,7 +1,7 @@
 #' @name shoe_grab
 #' @export
 #'
-#' @title  Single Shoe Extractor
+#' @title  Single Logitudinal Shoe Extractor
 #'
 #' @description This fuction creates a mesh object of a specified shoe from the data.raw folder
 #'
@@ -15,7 +15,9 @@
 #' @importFrom Rvcg vcgImport
 #' @importFrom stringr str_detect
 #' @importFrom tibble tibble
+#' @importFrom dplyr mutate
 #' @importFrom purrr map
+#' @importFrom Morpho berycenter
 #' @import assertthat
 
 
@@ -32,8 +34,8 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
   if (!is.null(scandate)) {
 
     # grabbing a single shoe
-    shoePath <- stl_files[str_detect(stl_files, "3_1_1")]
-    shoe <- shoePath[str_detect(shoePath, scandate)]
+    shoePath <- stl_files[stringr::str_detect(stl_files, "3_1_1")]
+    shoe <- shoePath[stringr::str_detect(shoePath, scandate)]
 
     # checking to see if the file exists
     assertthat::see_if(file.exists(shoe))
@@ -42,19 +44,18 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
     shoe_mesh <- Rvcg::vcgImport(shoe, clean = T)
     # Checking that it is a mesh3d object
     assertthat::assert_that(class(shoe_mesh) == "mesh3d")
-    centering<-Morpho::berycenter(shoe_mesh)
+    centering<-Morpho::barycenter(shoe_mesh)
     shoemesh<-translate3d(shoe_mesh, -centering[1], -centering[2], -centering[3])
   }
 
   if (is.null(scandate)) {
     shoespath <- stl_files[str_detect(stl_files, "3_1_1")]
 
-    shoe_mesh <- tibble(Shoe = shoespath) %>%
-      mutate(
+    shoe_mesh <- tibble::tibble(Shoe = shoespath) %>%
+      dplyr::mutate(
         exists = file.exists(shoespath),
         stl = purrr::map(Shoe, Rvcg::vcgImport)
       )
-    for(i){ }#get for list
   }
 
   # returning a mesh3d object
