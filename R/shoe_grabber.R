@@ -22,14 +22,25 @@
 
 
 shoe_grabber <- function(shoeid, scandate, filepath) {
-  stl_files <- list.files(filepath, pattern = paste0(shoeid, ".*.stl"), full.names = T)
+  stl_files <- list.files(filepath, pattern = ".stl", full.names = T)
   # checking to see if the folder containing the data is not empty
   assertthat::not_empty(stl_files)
-  stl_file_path <- stl_new[str_detect(stl_files, scandate)]
+  ##
+  stl_file_path <- stl_new[str_detect(stl_files, shoeid)]
+  shoePath <- stl_file_path[stringr::str_detect(stl_file_path, scandate)]
+  #checking to make sure the shoe exists
+  assertthat::see_if(file.exists(shoePath))
+  ###
+  shoe <- Rvcg::vcgImport(shoePath, clean = T)
+  #checking to make sure the shoe is a mesh object
+  assertthat::assert_that(class(shoe) == "mesh3d")
 
-  shoe <- Rvcg::vcgImport(stl_file_path, clean = T)
-  centering<-Morpho::barycenter(shoe)
+  ##
+  centering<-Morpho::barycenter(shoe)%>%colMeans()
   meshshoe<-translate3d(shoe, -centering[1], -centering[2], -centering[3])
+
+
+
 
   return(meshshoe)
 }
