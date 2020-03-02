@@ -56,6 +56,7 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
         exists = file.exists(shoespath),
         stl = purrr::map(Shoe, Rvcg::vcgImport)
       )
+
     oneshoe1<-shoe_mesh["stl"][[1]][[1]]
     centering<-Morpho::barycenter(oneshoe1)%>%colMeans()
     shoemesh1<-translate3d(oneshoe1, -centering[1], -centering[2], -centering[3])
