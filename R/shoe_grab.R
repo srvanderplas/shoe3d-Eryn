@@ -70,7 +70,7 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
     centering<-Morpho::barycenter(oneshoe4)%>%colMeans()
     shoemesh4<-translate3d(oneshoe4, -centering[1], -centering[2], -centering[3])
 
-    shoemesh<-c(shoemesh1,shoemesh2,shoemesh3,shoemesh4)
+    shoemesh<-list(shoemesh1,shoemesh2,shoemesh3,shoemesh4)
 
   }
 
