@@ -6,34 +6,80 @@ output: html_document
 ---
 
 
-
 ```{r setup}
 #library(shoe3d)
 library(tidyverse)
+library(Morpho)
 library(rgl)
 library(Rvcg) # package for working with 3d meshes in R
 library(MBA) # Spline regression
 knitr::opts_chunk$set(cache = T)
 ```
 
-Importing the shoes: (Using this since the shoes do not follow the same format as shoe grab)
+
+
+
+
 ```{r}
 stl_new <- list.files("../data-raw/My_Scans", pattern = ".stl", full.names = T)
 stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
 sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
-centering<-Morpho::barycenter(sony1) #this is added now for the shoe_grab for the longitudinal shoes
-sony1<-translate3d(sony1, -centering[1], -centering[2], -centering[3])
+sony1<-Arothron::trasf.mesh(sony1, barycenter = Arothron::bary.mesh(sony1))
 stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][2]
 sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
-centering<-Morpho::barycenter(sony2)
-sony2<-translate3d(sony2, -centering[1], -centering[2], -centering[3])
+sony2<-Arothron::trasf.mesh(sony2, barycenter = Arothron::bary.mesh(sony2))
 ```
 
 
 ```{r}
-rgl::plot3d(sony2, aspect="iso", col="green", add=TRUE)
+#trying the new shoe_grabber 
+Sonyscan<-shoe_grabber(shoeid = "SonyL", scandate = "20190618", filepath = "../data-raw/My_Scans")
+```
+
+
+```{r}
+#testing to see if it is doing what i would like for it to do, and it worked for about an hour.... 
+rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2, aspect="iso",col="red", add=TRUE)
+rgl::plot3d(Sonyscan, aspect="iso", col="green", add=TRUE)
 axes3d()
 ```
+
+
+
+
+Can now use the shoe_grabber function to grab anyshoe given the scan date, which we will be using going forward, since it centers the shoe as well as turning it into a mesh object. 
+
+```{r}
+Sonyscan2<-shoe_grabber(shoeid = "SonyL", scandate = "20190618", filepath = "../data-raw/My_Scans")
+Sonyscan5<-shoe_grabber(shoeid = "SonyL", scandate = "20191107", filepath = "../data-raw/My_Scans")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -45,6 +91,10 @@ sony1shoe<-shoe_coord(sony1)
 sony2shoe<-shoe_coord(sony2)
 ```
 
+
+
+
+
 ```{r}
 sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
 sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
@@ -55,47 +105,14 @@ sony2tran<-transform3d(sony2, matrix =rotationMatrix(matrix = sony2pca$rotation)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
-#colMeans1 <- colMeans(sony1shoe)
-#sony1c <- translate3d(sony1, -colMeans1[1], -colMeans1[2], -colMeans1[3])
-rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
-rgl::plot3d(sony11, aspect="iso", col="green", add=TRUE)
+#Not aligned
+rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
 axes3d()
-
-#colMeans2 <- colMeans(sony2shoe)
-#sony2c <- translate3d(sony2, -colMeans2[1], -colMeans2[2], -colMeans2[3])
-#rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
-
 ```
 
 
-
-```{r}
-#This works really well...it takes a while but now that the shoes are initially centered, this is also centered 
-shoeing<-Morpho::pcAlign(sony1,sony2)
-```
-
-```{r}
-str(sony1)
-```
 
 
 ```{r}
@@ -126,8 +143,8 @@ rotattionmat1<-rbind(cbind(t(sony2pca$rotation), c(1, 1, 1)), c(0, 0, 0, 1))
 
 ```{r}
 #FIND A CENTERING??
-sony1tran<-transform3d(sony1, matrix = rotationMatrix(matrix = sony1pca$rotation))
-sony2tran<-transform3d(sony2, matrix =rotationMatrix(matrix = sony2pca$rotation))
+sony1try<-transform3d(sony1, matrix = rotationMatrix(matrix = rotattionmat))
+sony2try<-transform3d(sony2, matrix =rotationMatrix(matrix = rotattionmat1))
 
 #rgl::plot3d(sony1, aspect="iso", col="blue", add=TRUE)
 #rgl::plot3d(sony1tran, aspect="iso", col="lightblue", add=TRUE)
@@ -136,8 +153,8 @@ sony2tran<-transform3d(sony2, matrix =rotationMatrix(matrix = sony2pca$rotation)
 #rgl::plot3d(sony2tran, aspect="iso", col="lightgreen", add=TRUE)
 #axes3d()
 
-rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
-rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+rgl::plot3d(sony1try, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony2try, aspect="iso", col="green", add=TRUE)
 axes3d()
 
 #transform3d(sony1, matrix = rotationMatrix(matrix = sony1pca$rotation))
@@ -168,6 +185,9 @@ sony1low<-shoe_coord(sony1, verts = 7)
 sony2low<-shoe_coord(sony2, verts = 7)
 ```
 
+```{r}
+
+```
 
                                                 
 ```{r}
@@ -267,4 +287,10 @@ scene <- scene3d()
 
 
 
+
+
+```{r}
+#This works really well...it takes a while but now that the shoes are initially centered, this is also centered 
+shoeing<-Morpho::pcAlign(sony1,sony2)
+```
 

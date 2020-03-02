@@ -39,8 +39,8 @@ center3d <- function(mesh, method=barycenter) {
 sony1c <- center3d(sony1)
 sony2c <- center3d(sony2)
 
-rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
-rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+rgl::plot3d(sony2c, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony1c, aspect="iso", col="green", add=TRUE)
 axes3d()
 
 
@@ -63,19 +63,21 @@ sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
 #FIND A CENTERING??
 sony1tran<-transform3d(sony1c, matrix = rotationMatrix(matrix = sony1pca$rotation))
 sony2tran<-transform3d(sony2c, matrix =rotationMatrix(matrix = sony2pca$rotation))
+```
 
+```{r}
 # rotate first scan into pc1, pc2, pc3
-rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
-rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+#rgl::plot3d(sony1c, aspect="iso", col="blue", add=TRUE)
+rgl::plot3d(sony1tran, aspect="iso", col="red", add=TRUE)
 
 # rotate second scan into pc1, pc2, pc3
-rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
-rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
-axes3d()
+#rgl::plot3d(sony2c, aspect="iso", col="green", add=TRUE)
+rgl::plot3d(sony2tran, aspect="iso", col="red", add=TRUE)
+#axes3d()
 
 # rotated scans
-rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
-rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
+#rgl::plot3d(sony1tran, aspect="iso", col="blue", add=TRUE)
+#rgl::plot3d(sony2tran, aspect="iso", col="green", add=TRUE)
 axes3d()
 
 ```
@@ -95,11 +97,11 @@ rotations <- list(
   rotationMatrix(matrix=diag(c(-1,-1,-1)))
 )
 
-rgl::plot3d(sony2tran, aspect="iso", col="blue", add=TRUE)
-axes3d()
-rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
-rgl::plot3d(transform3d(sony1tran, matrix = rotations[[3]]), aspect="iso", col="darkgreen", add=TRUE)
-rgl::plot3d(transform3d(sony1tran, matrix = rotations[[4]]), aspect="iso", col="cyan", add=TRUE) # this is the one
+#rgl::plot3d(sony2tran, aspect="iso", col="blue", add=TRUE)
+#axes3d()
+#rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
+#rgl::plot3d(transform3d(sony1tran, matrix = rotations[[3]]), aspect="iso", col="darkgreen", add=TRUE)
+#rgl::plot3d(transform3d(sony1tran, matrix = rotations[[4]]), aspect="iso", col="cyan", add=TRUE) # this is the one
 
 
 # july scan compared to first

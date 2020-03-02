@@ -44,7 +44,7 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
     shoe_mesh <- Rvcg::vcgImport(shoe, clean = T)
     # Checking that it is a mesh3d object
     assertthat::assert_that(class(shoe_mesh) == "mesh3d")
-    centering<-Morpho::barycenter(shoe_mesh)
+    centering<-Morpho::barycenter(shoe_mesh)%>%colMeans()
     shoemesh<-translate3d(shoe_mesh, -centering[1], -centering[2], -centering[3])
   }
 
@@ -56,6 +56,21 @@ shoe_grab <- function(shoeid, scandate = NULL, filepath) {
         exists = file.exists(shoespath),
         stl = purrr::map(Shoe, Rvcg::vcgImport)
       )
+    oneshoe1<-shoe_mesh["stl"][[1]][[1]]
+    centering<-Morpho::barycenter(oneshoe1)%>%colMeans()
+    shoemesh1<-translate3d(oneshoe1, -centering[1], -centering[2], -centering[3])
+    oneshoe2<-shoe_mesh["stl"][[1]][[2]]
+    centering<-Morpho::barycenter(oneshoe2)%>%colMeans()
+    shoemesh2<-translate3d(oneshoe2, -centering[1], -centering[2], -centering[3])
+    oneshoe3<-shoe_mesh["stl"][[1]][[3]]
+    centering<-Morpho::barycenter(oneshoe3)%>%colMeans()
+    shoemesh3<-translate3d(oneshoe3, -centering[1], -centering[2], -centering[3])
+    oneshoe4<-shoe_mesh["stl"][[1]][[4]]
+    centering<-Morpho::barycenter(oneshoe4)%>%colMeans()
+    shoemesh4<-translate3d(oneshoe4, -centering[1], -centering[2], -centering[3])
+
+    shoemesh<-c(shoemesh1,shoemesh2,shoemesh3,shoemesh4)
+
   }
 
   # returning a mesh3d object
