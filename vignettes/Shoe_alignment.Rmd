@@ -26,7 +26,7 @@ shoe05<-shoe_grab(shoeid = "005772L", scandate = NULL ,filepath="../data-raw")
 then pulling out a single shoe 
 
 ```{r}
-shoe05_3<-shoe05[[1]][["stl"]][[3]]
+
 ```
 
 A triangle mesh object is made up of the following parts, sufaces, polygons, faces, edges and vertices.
