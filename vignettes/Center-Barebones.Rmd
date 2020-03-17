@@ -96,7 +96,9 @@ rotations <- list(
   rotationMatrix(matrix=diag(c(-1,-1,1))),
   rotationMatrix(matrix=diag(c(-1,-1,-1)))
 )
+```
 
+```{r}
 #rgl::plot3d(sony2tran, aspect="iso", col="blue", add=TRUE)
 #axes3d()
 #rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
@@ -107,9 +109,9 @@ rotations <- list(
 # july scan compared to first
 rgl::plot3d(transform3d(sony2tran, matrix = rotations[[2]]), aspect="iso", col="blue", add=TRUE)
 axes3d()
-rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
+#rgl::plot3d(transform3d(sony1tran, matrix = rotations[[2]]), aspect="iso", col="green", add=TRUE)
 rgl::plot3d(transform3d(sony1tran, matrix = rotations[[3]]), aspect="iso", col="cyan", add=TRUE) # this one
-rgl::plot3d(transform3d(sony1tran, matrix = rotations[[4]]), aspect="iso", col="darkgreen", add=TRUE) 
+#rgl::plot3d(transform3d(sony1tran, matrix = rotations[[4]]), aspect="iso", col="darkgreen", add=TRUE) 
 
 
 ```
@@ -131,5 +133,57 @@ Maybe interesting:
 https://courses.cs.washington.edu/courses/cse577/11au/notes/Z12.pdf
 
 https://stackoverflow.com/questions/9065156/how-to-align-two-meshes
+
+
+# ICP using the already PC aligned shoes 
+
+```{r}
+scan1<-transform3d(sony2tran, matrix = rotations[[2]])
+scan2<-transform3d(sony1tran, matrix = rotations[[3]])
+```
+
+
+```{r}
+#checking to see that i chose the right rotations 
+rgl::plot3d(scan1, aspect="iso", col="cyan", add=TRUE) 
+rgl::plot3d(scan2, aspect="iso", col="blue", add=TRUE) 
+
+```
+
+
+
+```{r}
+testa<-icp(scan1, scan2, iterations = 100)
+```
+
+```{r}
+#ICP1.png  ICP2.png and ICPzoom.png
+#rgl::plot3d(scan1, aspect="iso", col="cyan", add=TRUE) 
+rgl::plot3d(scan2, aspect="iso", col="blue", add=TRUE) 
+rgl::plot3d(testa, aspect="iso", col="red", add=TRUE)
+axes3d()
+```
+
+
+##fewer points 
+
+```{r}
+scan1fewpoints<-data.frame(shoe_coord(scan1, verts = 6))
+scan2fewpoints<-data.frame(shoe_coord(scan2, verts = 6))
+```
+
+
+```{r}
+N<-nrow(scan1fewpoints)
+indices <- c( seq(1,N,by=1))
+fewerpoints1<-tmesh3d(as.matrix(scan1fewpoints),indices = indices)
+```
+
+#planear 
+
+
+```{r}
+
+```
 
 
