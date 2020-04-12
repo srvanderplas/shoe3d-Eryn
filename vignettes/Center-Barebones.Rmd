@@ -39,7 +39,7 @@ center3d <- function(mesh, method=barycenter) {
 sony1c <- center3d(sony1)
 sony2c <- center3d(sony2)
 
-rgl::plot3d(sony2c, aspect="iso", col="blue", add=TRUE)
+#rgl::plot3d(sony2c, aspect="iso", col="blue", add=TRUE)
 rgl::plot3d(sony1c, aspect="iso", col="green", add=TRUE)
 axes3d()
 
@@ -183,7 +183,18 @@ fewerpoints1<-tmesh3d(as.matrix(scan1fewpoints),indices = indices)
 
 
 ```{r}
-
+vertices <- c( 
+     -1.0, -1.0,  1.0,
+      1.0, -1.0,  1.0,
+      1.0,  1.0,  1.0,
+     1.0, -1.0, -1.0,
+      1.0, -1.0, -1.0,
+      1.0,  1.0, -1.0
+  )
+  indices <- c( 1, 2, 3, 4,5,6 )
+  
+  open3d()  
+   wire3d(qmesh3d(vertices, indices) )
 ```
 
 

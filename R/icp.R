@@ -76,14 +76,16 @@ icp <- function(mesh1, mesh2, iterations=3,lm1=NULL, lm2=NULL, uprange=1, maxdis
         }
       }
     }
+
+    #if reverse is true apply the switch of the transform to get the reversal
     ## get transform for current iteration
-    trafo <- computeTransform(x2[good,],x1[good,],type=type)
+    trafo <- computeTransform(x1[good,],x2[good,],type=type) #applying mesh 2 to mesh 1 (the fixed mesh object) and giving the transformation:
 
     ## apply transformation to mesh1 if no subsampling
     if (is.null(subsample)) {
-      mesh1 <- applyTransform(mesh1,trafo)
+      mesh2 <- applyTransform(mesh2,trafo)
     }
-    if (!is.null(subsample)) {
+    if (!is.null(subsample)) { #right now we are not working with this, so it can be changed later
       ## hack until changes from Morpho::applyTransform are published
       ntrafo <- trafo
       ntrafo[1:3,4] <- 0
@@ -96,7 +98,7 @@ icp <- function(mesh1, mesh2, iterations=3,lm1=NULL, lm2=NULL, uprange=1, maxdis
   }
   if (!is.null(subsample)) {
     trafo <- computeTransform(mysample,origsample)
-    mesh1 <- applyTransform(mesh1,trafo)
+    mesh2 <- applyTransform(mesh2,trafo)
   }
   if (!silent) {
     if ((count %% 50)  == 0 && count != 0)
@@ -107,7 +109,7 @@ icp <- function(mesh1, mesh2, iterations=3,lm1=NULL, lm2=NULL, uprange=1, maxdis
     trafo <- computeTransform(vert2points(mesh1),vert2points(meshorig),type=type)
     if (!is.null(lm1))
       lm1 <- applyTransform(lm1,trafo)
-    return(list(mesh=mesh1,transform=trafo,landmarks=lm1))
+    return(list(mesh=mesh1,transform=trafo,landmarks=lm1, distance=distinc)) #also add get distance to return from the last iteration
   } else {
     return(mesh1)
   }
