@@ -36,6 +36,10 @@ sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
 sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
 sony1tran<-transform3d(sony1c, matrix = rotationMatrix(matrix = sony1pca$rotation))
 sony2tran<-transform3d(sony2c, matrix =rotationMatrix(matrix = sony2pca$rotation))
+scan1<-transform3d(sony1tran, matrix = rotations[[8]])
+scan2<-transform3d(sony2tran, matrix = rotations[[7]])
+icp12<-icp(scan1, scan2, iterations = 100)
+
 
 KDtree1 <- vcgCreateKDtreeFromBarycenters(sony2tran)
 proMesh1 <- vcgClostOnKDtreeFromBarycenters(KDtree1,sony1tran,sign=F,k=50,threads=0)
@@ -53,6 +57,12 @@ distance<-function(mesh1, mesh2){
   return(dists)
 }
 
-
+test<-distance(sony1, sony2)
 testing<-distance(sony1c, sony2c)
 test2<-distance(scan1, scan2)
+test3<-distance(scan2, icp12)
+
+#these are all different scans, but the same distance
+qud <- quantile(test,probs=1)
+quad2<-quantile(testing, probs = 1)
+quad4<-quantile(test3, probs = 1)
