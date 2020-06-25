@@ -34,6 +34,20 @@ max(dists)
 #now seeing if alligning is working correctly or that the distances are different
 sony1pca<-prcomp(sony1shoe, center = TRUE,scale. = FALSE)
 sony2pca<-prcomp(sony2shoe, center = TRUE,scale. = FALSE)
+
+#
+rotations <- list(
+  rotationMatrix(matrix=diag(c(1,1,1))),
+  rotationMatrix(matrix=diag(c(-1,1,1))),
+  rotationMatrix(matrix=diag(c(1,-1,1))),
+  rotationMatrix(matrix=diag(c(1,1,-1))),
+  rotationMatrix(matrix=diag(c(1,-1,-1))),
+  rotationMatrix(matrix=diag(c(-1,1,-1))),
+  rotationMatrix(matrix=diag(c(-1,-1,1))),
+  rotationMatrix(matrix=diag(c(-1,-1,-1)))
+)
+
+#
 sony1tran<-transform3d(sony1c, matrix = rotationMatrix(matrix = sony1pca$rotation))
 sony2tran<-transform3d(sony2c, matrix =rotationMatrix(matrix = sony2pca$rotation))
 scan1<-transform3d(sony1tran, matrix = rotations[[8]])
