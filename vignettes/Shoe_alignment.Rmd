@@ -53,7 +53,24 @@ An example:
 
 
 
+
+
+
 Once you have a rotation matrix from a principal component analysis, we need to turn the eclidean matrix into a homogeneous matrix in order to apply the given rotation to the orginal mesh3d object (so that surface areas can be compared rather than just the points of the verticies in the coordinate plane). 
+
+
+
+
+
+
+
+#Measuring Distance
+
+
+In order to find out how well our alignment is doing, we need to find the the distance between two different mesh objects. Because the points of a mesh object are arbitrarily chosen depending on the specified shoe scan. In order to correct for this we must find the closest point distance. To find this, we will be using the K-distance neighbor search, within each corresponding shoe made of a mesh object. K closest distance is measured in squared Euclidean distance.For two vectors (w_1,x_1,y_1,z_1) and (w_2,x_2,y_2,z_2), the euclidean distance is found by: 
+      (w_1-w_2)^2+(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2
+K-D construction is as follows divide the points in half by a line perpendicular to one of the axes, in each tree. Then recursively construct k-d trees for the two sets of points, the two points corresponding to the verticies of the triangles. Think of it as this, we first choose a shoe to be set. In this case shoe scan 1. Then for each one of the verticies of a triangle we draw a ball with radius \epsilon then we start espilon to be 0 and expand it till you hit the closest section with a specified point. Once that point is found, the distance is meausured and recorded. To impliment this method, the function vcgClostKD in the package Rvcg. Once these distances were found, we can extract specified quantiles of the distances in order to compare two shoe scan. For example, before any alignment, the range of distances between scan one and scan 2 was -98.45, and 65.24, however after pca alignment, we have the distance ranging from -11.05, to 29.45, this shows that the first step in our alignment is making a large difference in bringing the shoes closer together. We can then plot these differences using a color scale on the first shoe, where red represents a large difference between shoe scan 1 and shoe scan 2 in the positive direction and blue in the negative direction, and yellow/teal represents a small difference. The difference described numerically above can be seen in the two photos below. Here we see that without alignment, the shoes dramatically change distanced due to the angle they overlap by, (see some image above figure something), however when they are aligned, the distance changes slowly and shows the typical wear pattern areas in 
+      
 
 
 
