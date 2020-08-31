@@ -12,6 +12,10 @@ stl_file_path1 <- stl_new[str_detect(stl_new, "SonyL")][1]
 sony1 <- Rvcg::vcgImport(stl_file_path1, clean = T)
 stl_file_path2 <- stl_new[str_detect(stl_new, "SonyL")][3]
 sony2 <- Rvcg::vcgImport(stl_file_path2, clean = T)
+center3d <- function(mesh, method=barycenter) {
+  bary <- method(mesh) %>% colMeans()
+  translate3d(mesh, -bary[1], -bary[2], -bary[3])
+}
 sony1c <- center3d(sony1)
 sony2c <- center3d(sony2)
 sony1shoe<-shoe_coord(sony1c)
@@ -39,7 +43,9 @@ scan1<-transform3d(sony1tran, matrix = rotations[[8]])
 scan2<-transform3d(sony2tran, matrix = rotations[[7]])
 icp12<-icp(scan1, scan2, iterations = 100)
 
-
+icpabdist<-icp12[[2]]
+avgicpdist<-mean(icpabdist)
+avgicpdist
 #testing distance to start with from the original icp function:
 
 KDtree <- vcgCreateKDtreeFromBarycenters(sony2c)
@@ -139,9 +145,27 @@ upperac<-quantile(distancesac, probs=.95, na.rm = TRUE)
 closestsequenceac <- seq(from=lowac,to=upperac,length.out=25)
 
 closestsequenceac
+
+proicp <- Rvcg::vcgClostKD(icp12[[1]],scan2,sign=T,threads = 1)
+closestac <- proicp$vb[1:3,]
+distancesac<- proicp$quality
+
+absoluteval<-abs(distancesac)
+mean(absoluteval)
+
+View(head(distancesac))
+lowac <- quantile(distancesac,probs=0.05,na.rm = TRUE)
+upperac<-quantile(distancesac, probs=.95, na.rm = TRUE)
+
+closestsequenceac <- seq(from=lowac,to=upperac,length.out=25)
+
+closestsequenceac
+
 #############################################################################################################
 
-#these are all getting different response so
+#comparison between icp distance and KD
+
+
 
 
 

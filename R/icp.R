@@ -111,6 +111,6 @@ icp <- function(mesh1, mesh2, iterations=3,lm1=NULL, lm2=NULL, uprange=1, maxdis
       lm1 <- applyTransform(lm1,trafo)
     return(list(mesh=mesh1,transform=trafo,landmarks=lm1, distance=distinc)) #also add get distance to return from the last iteration
   } else {
-    return(mesh1)
+    return(list(mesh1,dists))
   }
 }
