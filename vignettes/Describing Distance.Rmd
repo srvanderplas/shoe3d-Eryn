@@ -105,10 +105,6 @@ In order to get the final distance, the difference vectors are complined using s
 
 
 
-This is repeated for the set iterations, or until epsilon is deemed small enough. Each time the distance is measured, but the K-D tree sectioning remains the same through the process. This gives us N distances for the number of iterations. We return the final N iteration's distances from each set of verities. The mean of these distances is then computed, giving us a distance metric. This is used to find the magnitude of the distance between the two shoes.
-
-
-
 
 
 
