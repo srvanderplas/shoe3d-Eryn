@@ -5,16 +5,6 @@ date: "9/8/2020"
 output: html_document
 ---
 
-Through these processes, we have found two different differences. The first difference is found through the icp process. We need two processes 
-
-In this process, we set the first scan as a base scan. This scan does not move through the process. Once this scan is set, using a K-D tree method the shoe is divided up into sections until there is only one vertex in each section. This process is done to the second shoe as well. Each point is then pair with the closest euclidean distance corresponding point. This is repeated for the set itterations, or until epsilon is deemed small enough. This is done by the following mathematical formula. 
-
-
-
-
-Each time the distance is measured, but the K-D tree sectioning remains the same through the process. This gives us N distances for the number of iterations. We return the final N iteration's distances from each set of verities. The mean of these distances is then computed, giving us a distance metric. This is used to find the magnitude of the distance between the two shoes. In order to find the direction of the distance, positive or negative, we look at the shoes after full alignment. This is done using a K-distance neighbor search as well, within each corresponding shoe made of a mesh object. K closest distance is measured in squared Euclidean distance.For two vectors (w_1,x_1,y_1,z_1) and (w_2,x_2,y_2,z_2), the euclidean distance is found by: 
-      (w_1-w_2)^2+(x_1-x_2)^2+(y_1-y_2)^2+(z_1-z_2)^2
-K-D construction is as follows divide the points in half by a line perpendicular to one of the axes, in each tree. Then recursively construct k-d trees for the two sets of points, the two points corresponding to the verities of the triangles. Think of it as this, we first choose a shoe to be set. In this case shoe scan 1. Then for each one of the verticies of a triangle we draw a ball with radius \epsilon then we start epsilon to be 0 and expand it till you hit the closest section with a specified point. Once that point is found, the distance is measured and recorded (without the absolute value). Then taking the mean of these distances, we can get the direction of the differences. 
 
 
 
@@ -24,4 +14,114 @@ In order to align the shoes through an automatized process, we need to use the f
 add visual 
 
 however, as shown there are only 4 unique matrices. In order to choose which one of these matrices, the first shoe scan in time is set as the base scan. Then each of the four matrices described above is applied to second scan. After each rotation, the distance between the first and second scan is measured (using the equation above) and recorded. The matrix with the smallest distance is used as the rotation matrix, and is applied to the second shoe. Once the shoes are initially alligned, ICP is applied with an iteration of the aligners choosing. Once ICP has been performed, the distance is again measured and recorded. The function the exports a list with the two aligned shoes and the distance metric. 
+
+
+
+
+
+
+Automated Alignment: 
+
+In order to align the shoes through an automatized process, we need to use the following steps. 
+
+1. We begin with the two mesh objects of the same shoe at different time points, say time i and time j.Then using the barycenter, or center of mass, we center the shoes on the same x,y,z, coordinate system. This center of mass is found by 
+Center of mass= \sum^n_{i=1}x_im_i/\sum^n_{i=1}m_i, Where m_i is mass of a point in an object and x_i is the position of that point. This puts the point (0,0,0) on the interior of the shoe. 
+
+
+2. After the shoes are then centered, they are transformed into a point cloud made up of the verities of the triangle mesh object. Vertices of a triangle mesh object were extracted and mapped onto a x,y,z coordinate plane.  This allowed the information concerning the location of each vertex to be held in a Nxp matrix. 
+
+
+
+3. Using these two coordinate systems, one for each shoe. Principal component analysis is performed. This gives us a 3X3 rotation matrix in which to transform the original mesh object by the PCA rotation matrix.
+
+
+|   |      PC1     |    PC2        |       PC3     |
+|---|--------------|---------------|---------------|
+| x | 0.5603136    |   -0.2618793  |   0.78579127  |
+| y | 0.3038740    |   0.9475434   |   0.09910676  |
+| z | 0.7705253    |  -0.1832507   |   -0.61049973 |
+|   |              |               |               |
+
+
+ The first principal component is the length of the shoe, the largest source of variability.  This first principal component direction is the same for every set of shoes.  After principal component analysis, the length of the shoe centers at 0 on the x axis. The second principal component  then  will  be  the  width  of  the  shoe;  the  height  would  be  the  third.   This  alignment algorithm puts all shoes on the same plane. 
+
+
+4. Due to the nature of PCA, the rotation matrix that we are using is not unique. Further more it often times has a negative determinate (as seen above). If this happens, we need to rotate the mesh shoe object by a matrix whose diagonal is (1,1,-1). Leaving us with a positive determinate.
+
+5. After this is done, there is no guarantee that the two shoes although sharing the same space in x,y,z where x is the length of the shoe, y the width and z the depth, will be in the same direction. In order to correct for this we need to rotate the shoes by 180 degrees in x,y,z or a combination of those directions. There are 8 possibilities of those rotations:
+
+  1. rotation around the x-axis 180 degrees 
+  2. rotation around the y-axis 180 degrees
+  3. rotation around the z-axis 180 degrees
+  4. rotation around the x-axis 180 degrees and the y-axis 180 degrees
+  5. rotation around the x-axis 180 degrees and the z-axis 180 degrees
+  6. rotation around the y-axis 180 degrees and the z-axis 180 degrees
+  7. rotation around the x-axis 180 degrees and the y-axis 180 degrees and the z-axis 180 degrees
+  8. No rotation is needed 
+
+This gives us 4 unique matrices rotate our second scan by in order to match the first.
+
+The four matrices are: 
+
+
+
+
+
+In order to choose which one of these matrices, the first shoe scan in time is set as the base scan. Then each of the four matrices described above is applied to second scan. After each rotation, mean absolute difference between the first and second scan is measured. The matrix with the smallest distance is used as the rotation matrix, and is applied to the second shoe. For example, with scan 1 and scan 2, the four matrices lead to the following 4 differences:  2.153458, 9.124214, 9.117095, and 6.234845. Thus scan 2 is rotated by the matrix of the diag(1,1,1). 
+
+
+
+
+The algorithm used to define the differences is that of the K-D tree method. The K-D tree is a multidimensional version of the familiar binary search tree, except that with more than one dimension, a branch-and-bound search is performed to find the nearest neighbor to a query point in a base 3-dimensional point cloud. That is for the 3-dimensional points there is O(log n) branches with a kd-tree. 
+Given the two 3-dimensional shoe spaces, let an exemplar a point in the 3-dimensional shoe scan. Then, let an exemplar-set be a finite set of exemplars.This algorithm adaptively partitions the exemplar set into a set of bins each with a roughly uniform number of exemplars. The higher the local density of exemplars the larger
+the number of bins per unit volume and the smaller the average spatial extents of those leaves. The K-D tree picks attributes according to which attribute for the current node has the greatest spatial spread as projected onto the current attribute. That is, the algorithim looks at the closest point on the second scan first in the x axis, then the y and finally the z. This algoritm takes a query point in the set base scan and using  each node v of the tree is associated with a d-dimensional rectangle called the cell of v, with the root cell being large enough to contain the entire set P. Let P_v be the intersection of P and the cell of v. If P_v<=1, then this v is a leaf (or a cell containing one point in the second shoe), if v>1, then the cell of v is split into two cells w and z by an axis-parallel to the hyperplane  such that the interior of each cell contains at most |P_v|/2 points of P_v. If the depth of v is i, then the hyperplane is parallel to the ((i mod d)+1)-th axis. The cell
+w and z is associated with the next axis with the most variance here the width of the shoe. This is repeated with the z-axis if the cells w and z have more than one point in them. Then each query point follows the nodes to the farthest level to be matched with a corresponding cell in the second scan. Once these cell and query point are matched. The difference (x_1-x_2)+(y_1-y_2)+(z_1-z_2) is then reported for each of the points in the base scan. This means that the number of differences is determined by the number of query points in the base scan. This leads us to different number of differences based on what the number of points is. Although based on the same base scan, the  process then finds a vector of difference from each point in the base scan to the second scan scan, deterministically. 
+
+In order to compare the rotation matrices discribed above, the aboslute value of the vector of differences is computed, using scan 1 as the base only, and the mean is taken. These means are then compared, and the smallest absolute mean difference is used as the rotation matrix to align the shoes in the same direction. 
+
+
+
+6. Once the shoes are initially aligned, ICP is applied with an iteration of the aligners choosing. The ICP algorithm registers two sets of points, A and B composed respectively of points from X_A and X_B, in this case the Nx3 matrices of points. Setting a particular point as a reference, the algorithm pairs each point of X_A with the corresponding point on X_B, using the K-D tree selective algorithm described above. Using these points a transformation is applied to X_B, then the query point in X_A is compared again to the closest cell in X_B, where the difference is then measured. This is done iteratively until the error, (e) is minimized for each i= 1, ...,B or the number iteration specified has been reached. 
+
+
+
+
+
+In order to get the final distance, the difference vectors are complined using scan 1 as the base then scan two as the base, since as explained above; the number of differences is based on the number of query points, base on the number of points in the scan. For example if you run scan 1 and scan 2 through this process, you will get the mean absolute difference of 0.98, using scan 1 as the query points. However, if you switch the positions of the shoe, making scan 2 the base for the query points you will get a different result of 2.243478. Once the vectors of differences for both scan 1 and scan 2 are computed,  the absolute values of the differences are taken and the mean of the absolute values is computed give a final distance metric between the two shoes. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This is repeated for the set iterations, or until epsilon is deemed small enough. Each time the distance is measured, but the K-D tree sectioning remains the same through the process. This gives us N distances for the number of iterations. We return the final N iteration's distances from each set of verities. The mean of these distances is then computed, giving us a distance metric. This is used to find the magnitude of the distance between the two shoes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
