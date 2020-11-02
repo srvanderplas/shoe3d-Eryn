@@ -24,3 +24,4 @@ In order to align the shoes through an automatized process, we need to use the f
 add visual 
 
 however, as shown there are only 4 unique matrices. In order to choose which one of these matrices, the first shoe scan in time is set as the base scan. Then each of the four matrices described above is applied to second scan. After each rotation, the distance between the first and second scan is measured (using the equation above) and recorded. The matrix with the smallest distance is used as the rotation matrix, and is applied to the second shoe. Once the shoes are initially alligned, ICP is applied with an iteration of the aligners choosing. Once ICP has been performed, the distance is again measured and recorded. The function the exports a list with the two aligned shoes and the distance metric. 
+
