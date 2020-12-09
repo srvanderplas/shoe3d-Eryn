@@ -9,14 +9,19 @@ output: html_document
 
 
 
-In order to align the shoes through an automatized process, we need to use the following steps. We begin with the two mesh objects of the same shoe at different time points, say time i and time j. Then using the barycenter, or center of mass, we center the shoes on the same x,y,z, coordinate system. After the shoes are then centered, they are transformed into a point cloud made up of the verities of the triangle mesh object. Using these two coordinate systems. Principal component analysis is performed. This gives us a 3X3 rotation matrix in which to transform the original mesh object by the PCA rotation matrix. The first issue comes in here. Due to the nature of PCA, the rotation matrix that we are using is not unique. Further more it often times has a negative determinate. If this happens, we need to rotate the mesh shoe object by a matrix whose diaginal is (1,1,-1). Leaving us with a positive determinate. After this is done, there is no guarantee that the two shoes although sharing the same space in x,y,z where x is the length of the shoe, y the width and z the depth, will be in the same direction. In order to correct for this we need to rotate the shoes by 180 degrees in x,y,z or a combination of those directions. There are 8 possibilities of those rotations shown below 
-
-add visual 
-
-however, as shown there are only 4 unique matrices. In order to choose which one of these matrices, the first shoe scan in time is set as the base scan. Then each of the four matrices described above is applied to second scan. After each rotation, the distance between the first and second scan is measured (using the equation above) and recorded. The matrix with the smallest distance is used as the rotation matrix, and is applied to the second shoe. Once the shoes are initially alligned, ICP is applied with an iteration of the aligners choosing. Once ICP has been performed, the distance is again measured and recorded. The function the exports a list with the two aligned shoes and the distance metric. 
+In order to understand where wear occurs in a shoe, size 10 Men’s Saucony Kinvara athletic shoes we used as a test subject. Using a turntable and the EinScan Pro Plus scanner, a scanner with accuracy up to 0.04mm within a distance of 18 inches from the scanner itself. This scanner uses a fixed scan with 15 coded targets to scan a given shoe, at a light intensity of 3 out of 12.  Shoes were angled using sand, to ensure the full outsole was captured. Once a scan was captured, all excess parts of the shoe, such as the laces and the cloth of the shoe, were cropped off electronically.  This was done to eliminate extra information that may have impeded alignment, such as background points,which the scanner captured.  The scans were recorded as unweighted objects, in which holes,i.e areas where the light from the scanner could not penetrate, up to .1mm were filled. The scans were recorded as Standard Triangle Language (stl) 3D objects. The stl format describes only the surface geometry of a three-dimensional object without any representation of color, texture or other common model attributes. These attributes of this file type make stl files particularity useful in CAD software programs and 3D printing. For our test scans, the Saucony shoes, were scanned 6 times over an 9 month period, with the first scan in June, 2019 and the last scan in March, 2020. The shoes were worn on a regular basis by the participant. After we captured the data, the first step we performed in processing the shoes was to transform these stl files into a file that is compatible with the software.  Using the package rgl, we transformed the original stl object into a mesh object.  A triangle mesh object is a polygon mesh that comprises a set of triangles connected by their common edges and which shares similar vertices in order to define the shape of an object. A vertex is a position along, with other information such as color, normal vector and texture coordinates. Two vertices connected by a straight line become an edge. Three vertices, connected to each other by three edges, define a triangle. This is the simplest polygon in Euclidean space; thus allowing for the most flexibility in an object.  These triangles are faces of an object.  A collection of faces is a polygon; a collection of polygons makes up a surface, which in turn defines an object. However, this process arbitrarily applies an axes to the shoes.
 
 
 
+
+In order to align the shoes through an automatized process, we need to use the following steps. We begin with the two mesh objects of the same shoe at different time points, say time i and time j. Then using the barycenter, or center of mass, we center the shoes on the same x,y,z, coordinate system.
+
+After the shoes are then centered, they are transformed into a point cloud made up of the verities of the triangle mesh object.
+
+Using these two coordinate systems. Principal component analysis is performed. This gives us a 3X3 rotation matrix in which to transform the original mesh object by the PCA rotation matrix. The first issue comes in here. Due to the nature of PCA, the rotation matrix that we are using is not unique. Further more it often times has a negative determinate. If this happens, we need to rotate the mesh shoe object by a matrix whose diaginal is (1,1,-1). Leaving us with a positive determinate. After this is done, there is no guarantee that the two shoes although sharing the same space in x,y,z where x is the length of the shoe, y the width and z the depth, will be in the same direction. In order to correct for this we need to rotate the shoes by 180 degrees in x,y,z or a combination of those directions. There are 8 possibilities of those rotations shown below 
+
+
+However, as shown there are only 4 unique matrices. In order to choose which one of these matrices, the first shoe scan in time is set as the base scan. Then each of the four matrices described above is applied to second scan. After each rotation, the distance between the first and second scan is measured (using the equation above) and recorded. The matrix with the smallest distance is used as the rotation matrix, and is applied to the second shoe. Once the shoes are initially alligned, ICP is applied with an iteration of the aligners choosing. Once ICP has been performed, the distance is again measured and recorded. The function the exports a list with the two aligned shoes and the distance metric. 
 
 
 
@@ -92,7 +97,21 @@ In order to get the final distance, the difference vectors are complined using s
 
 
 
+After running this method. We get the following table: 
 
+
+| shoe alignment  |      distance (in cm)     |  
+|-----------------|---------------------------|
+|     1 v 2       |     1.04825818516351      |
+|     1 v 3       |     1.09885118503504      |
+|     1 v 4       |     1.88688086606273      |
+|     1 v 5       |     1.01732120664012      |
+|     2 v 3       |     0.493135766393248     |
+|     2 v 4       |     1.7622288986484       |
+|     2 v 5       |     0.963346144105468     |
+|     3 v 4       |     1.94614727051806      |
+|     3 v 5       |     0.972810336760941     |
+|     4 v 5       |     2.97077582007618      | 
 
 
 

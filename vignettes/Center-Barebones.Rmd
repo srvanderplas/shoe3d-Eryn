@@ -96,11 +96,11 @@ axes3d()
 # 3d point cloud from mesh
 ```{r}
 sony1shoe<-shoe_coord(sony1c)
-sony2shoe<-shoe_coord(sony2c)
-sony3shoe<-shoe_coord(sony3c)
-sony4shoe<-shoe_coord(sony4c)
-sony5shoe<-shoe_coord(sony5c)
-sony6shoe<-shoe_coord(sony6c)
+#sony2shoe<-shoe_coord(sony2c)
+#sony3shoe<-shoe_coord(sony3c)
+#sony4shoe<-shoe_coord(sony4c)
+#sony5shoe<-shoe_coord(sony5c)
+#sony6shoe<-shoe_coord(sony6c)
 ```
 # rotation matrices based on coordinates
 
